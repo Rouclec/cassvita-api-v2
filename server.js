@@ -3,6 +3,8 @@ require("dotenv").config({ path: "./config.env" });
 
 const app = require("./app");
 
+console.log("process env variable: ", process.env.DATABASE_CONNECTION_STRING);
+
 const DB = process.env.DATABASE_CONNECTION_STRING.replace(
   "<password>",
   process.env.DATABASE_PASSWORD
