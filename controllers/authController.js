@@ -153,7 +153,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     return next(
       res.status(500).json({
         status: "Server error!",
-        message: "Error sending email",
+        message: `Error sending email: ${error}`,
       })
     );
   }
