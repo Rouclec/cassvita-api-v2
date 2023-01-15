@@ -2,13 +2,14 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: [true, "Please provide a valid email"],
-      unique: [true, "Email already exists! Please try another email"],
+      required: [true, "Please provide a valid email yea?"],
+      unique: true,
       lowercase: true,
       validate: [validator.isEmail, "Please provide a valid email"],
     },
@@ -18,8 +19,12 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      unique: [true, "Phone number is already in use, please try another"],
       validate: [validator.isMobilePhone, "Please enter a valid phone number"],
+      index: {
+        unique: true,
+        sparse: true,
+        partialFilterExpression: { phoneNumber: { $type: "string" } },
+      },
     },
     role: {
       type: String,
@@ -57,6 +62,10 @@ const userSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+userSchema.plugin(uniqueValidator, {
+  message: "{PATH} {VALUE} already in use, please try another!",
+}); //enable beautifying on this schema
 
 //Pre method runs before a user object is 'saved'
 userSchema.pre("save", async function (next) {

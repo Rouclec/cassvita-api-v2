@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const corsOptions = {
   origin: "*",
@@ -11,6 +12,7 @@ const corsOptions = {
 const app = express();
 
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json({ limit: "10kb" }));
 

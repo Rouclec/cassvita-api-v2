@@ -14,6 +14,17 @@ const createAuthToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   user.password = undefined; //to remove the password field
 
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRATION * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+  res.cookie("jwt", token, cookieOptions);
+
   res.status(statusCode).json({
     status: "Success",
     token,
@@ -64,20 +75,24 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+  console.log("cookies: ", req.cookies);
   // 1) Get token from authorizaton header
   let token;
   if (
-    !(
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    )
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
   ) {
+    token = req.headers.authorization.split(" ")[1];
+    u;
+  } else if (req.cookies) {
+    token = req.cookies.jwt;
+    console.log("using cookies: ", req.cookies);
+  } else {
     return res.status(401).json({
       status: "Unauthorized",
       message: "Please login to access this route",
     });
   }
-  token = req.headers.authorization.split(" ")[1];
 
   // 2) verify token
   const verifiedToken = await promisify(jwt.verify)(

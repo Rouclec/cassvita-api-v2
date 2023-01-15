@@ -10,11 +10,11 @@ const {
 
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/forgotPassword", forgotPassword);
-router.patch("/resetPassword/:token", resetPassword);
+router.post("/login", login, protect);
+router.post("/forgot-password", forgotPassword);
+router.patch("/reset-password/:token", resetPassword);
 
 router.use(protect); //every route below this line, will pass through the protect middleware first
-router.post("/addUser", restrictTo("manager", "admin"), addUser);
+router.post("/add-user", restrictTo("manager", "admin"), addUser);
 
 module.exports = router;
