@@ -9,10 +9,10 @@ module.exports = class Email {
   }
 
   newTransport() {
-    if (process.env.NODE_ENV === "production") {
-      //TODO: create a transporter for sendgrid
-      return 1;
-    } else {
+//     if (process.env.NODE_ENV === "production") {
+//       //TODO: create a transporter for sendgrid
+//       return 1;
+//     } else {
       return nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
@@ -22,7 +22,7 @@ module.exports = class Email {
         },
         //Activate less secure app options in gmail
       });
-    }
+//     }
   }
 
   //send the actual email
