@@ -6,7 +6,6 @@ module.exports = (fxn) => {
           res.status(500).json({
             status: "Server Error",
             message: err.message.split(",")[0],
-            // message: err.name,
           })
         );
       } else if (err.name === "JsonWebTokenError") {
