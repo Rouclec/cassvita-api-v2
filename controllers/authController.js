@@ -75,7 +75,6 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  console.log("cookies: ", req.cookies);
   // 1) Get token from authorizaton header
   let token;
   if (
@@ -86,7 +85,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     u;
   } else if (req.cookies) {
     token = req.cookies.jwt;
-    console.log("using cookies: ", req.cookies);
   } else {
     return res.status(401).json({
       status: "Unauthorized",

@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 const corsOptions = {
-  origin: "*",
+  origin: "http://localhost:3000",
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -24,7 +24,7 @@ app.use(
     secret: "session",
     cookie: {
       maxAge: 1000 * 60 * 60,
-      sameSite: "none",
+      sameSite: "none", //set to true if F.E. is on production
       secure: false,
     },
   })
