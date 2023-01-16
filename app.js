@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
 
 const corsOptions = {
   origin: "*",
@@ -14,6 +15,18 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json());
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: "session",
+    cookie: {
+      maxAge: 1000 * 60 * 60,
+      sameSite: "none",
+      secure: true,
+    },
+  })
+);
 app.use(express.json({ limit: "10kb" }));
 
 const authRouter = require("./routes/authRoutes");
