@@ -15,6 +15,8 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json());
+
+//use session to enable passing cookies between different domains
 app.use(
   session({
     resave: false,
@@ -23,7 +25,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60,
       sameSite: "none",
-      secure: true,
+      secure: false,
     },
   })
 );
