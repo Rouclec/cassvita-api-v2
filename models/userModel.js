@@ -15,7 +15,11 @@ const userSchema = new mongoose.Schema(
     },
     fullName: {
       type: String,
-      default: "John Doe",
+      required: [true, "Please enter your name"],
+    },
+    username: {
+      type: String,
+      required: true,
     },
     phoneNumber: {
       type: String,
@@ -27,12 +31,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     role: {
-      type: String,
-      enum: ["driver", "admin", "manager"],
-      default: "manager",
-    },
-    photo: {
-      type: String,
+      type: mongoose.Schema.ObjectId,
+      ref: "Role",
     },
     password: {
       type: String,
