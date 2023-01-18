@@ -33,8 +33,11 @@ app.use(express.json({ limit: "10kb" }));
 
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
+const driverRouter = require("./routes/driverRoutes");
+const farmerRouter = require("./routes/farmerRoutes");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
-
+app.use("/api/v1/driver", driverRouter);
+app.use("./api/v1/farmer", farmerRouter);
 module.exports = app;
