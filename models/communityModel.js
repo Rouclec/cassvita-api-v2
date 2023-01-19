@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const communitySchema = new mongoose.Schema({
   name: {
@@ -24,6 +25,10 @@ const communitySchema = new mongoose.Schema({
   },
   unitPrice: Number,
 });
+
+communitySchema.plugin(uniqueValidator, {
+  message: "{PATH} {VALUE} already in use, please try another!",
+}); //enable beautifying on this schema
 
 const Community = mongoose.model("Community", communitySchema);
 module.exports = Community;

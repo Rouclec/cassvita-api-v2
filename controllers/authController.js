@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const Email = require("../utils/email");
 const crypto = require("crypto");
+const { createOne } = require("./helperController");
+const Role = require("../models/roleModel");
+const slugify = require("slugify");
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -35,7 +38,23 @@ const createAuthToken = (user, statusCode, res) => {
 };
 
 exports.addUser = catchAsync(async (req, res, next) => {
-  const user = await User.create(req.body);
+  const { fullName, username, email, password, passwordConfirm, role } =
+    req.body;
+
+  const userRole = await Role.findOne({
+    code: slugify(role, { lower: true }),
+  });
+
+  const newUser = {
+    fullName,
+    username,
+    email,
+    password,
+    passwordConfirm,
+    role: userRole._id,
+  };
+
+  const user = await User.create(newUser);
   user.password = undefined;
 
   return next(
@@ -82,7 +101,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
-    u;
   } else if (req.cookies) {
     token = req.cookies.jwt;
   } else {
@@ -123,7 +141,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo = (...roles) => {
   //takes an array of roles
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.user.role.code)) {
       //if user role is not in this array,
       return next(
         res.status(403).json({

@@ -35,5 +35,9 @@ const purchaseSchema = new mongoose.Schema({
   },
 });
 
+purchaseSchema.plugin(uniqueValidator, {
+  message: "{PATH} {VALUE} already in use, please try another!",
+}); //enable beautifying on this schema
+
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 module.exports = Purchase;

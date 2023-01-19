@@ -1,21 +1,19 @@
 const express = require("express");
+const { protect, restrictTo } = require("../controllers/authController");
+const {
+  getAllCommunities,
+  createCommunity,
+  updateCommunity,
+  getCommunity,
+} = require("../controllers/communityController");
+
 const router = express.Router();
+router.use(protect);
+router
+  .route("/")
+  .get(getAllCommunities)
+  .post(restrictTo("admin", "manager", "ceo"), createCommunity);
 
-const communityController = require("../controllers/communityController")
+router.route("/:id").patch(updateCommunity).get(getCommunity);
 
-
-router.get("/", communityController.read)
-router.post("/show", communityController.show)
-router.post("/create", communityController.create)
-router.post("/updateCommunity", communityController.updateCommunity)
-
-module.exports = router
-
-
-
-
-
-
-
-
-
+module.exports = router;

@@ -36,11 +36,13 @@ const userRouter = require("./routes/userRoutes");
 const driverRouter = require("./routes/driverRoutes");
 const farmerRouter = require("./routes/farmerRoutes");
 const communityRouter = require("./routes/communityRoutes");
+const roleRouter = require("./routes/roleRoutes");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/driver", driverRouter);
-app.use("./api/v1/farmer", farmerRouter);
+app.use("/api/v1/farmer", farmerRouter);
 app.use("/api/v1/community", communityRouter);
+app.use("/api/v1/role", roleRouter);
 
 module.exports = app;
