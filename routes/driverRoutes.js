@@ -1,11 +1,22 @@
 const express = require("express");
+const { protect, restrictTo } = require("../controllers/authController");
+const {
+  getAllDrivers,
+  createDriver,
+  getDriver,
+  updateDriver,
+} = require("../controllers/driverController");
+
 const router = express.Router();
 
-const driverController = require("../controllers/driverController")
+router.use(protect);
+router
+  .route("/")
+  .get(restrictTo("admin", "ceo", "manager"), getAllDrivers)
+  .post(restrictTo("admin", "ceo", "manager"), createDriver);
+router
+  .route("/:id")
+  .get(restrictTo("admin", "ceo", "manager"), getDriver)
+  .patch(restrictTo("admin", "ceo", "manager"), updateDriver);
 
-router.get("/", driverController.index)
-router.post("/show", driverController.show)
-router.post("/store", driverController.store)
-router.post("/update", driverController.update)
-
-module.exports = router
+module.exports = router;
