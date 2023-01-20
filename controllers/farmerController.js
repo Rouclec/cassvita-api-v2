@@ -1,7 +1,7 @@
 const Community = require("../models/communityModel");
 const Farmer = require("../models/farmerModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne } = require("./helperController");
+const { getAll, getOne, createOne } = require("./helperController");
 
 exports.getAllFarmers = getAll(Farmer);
 exports.getFarmer = getOne(Farmer);
