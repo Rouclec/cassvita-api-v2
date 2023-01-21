@@ -5,7 +5,7 @@ const {
   createBDC,
   getBDC,
   updateBDC,
-} = require("../controllers/dbcController");
+} = require("../controllers/bdcController");
 const router = express.Router();
 
 router.use(protect);

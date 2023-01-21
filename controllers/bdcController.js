@@ -1,4 +1,4 @@
-const BDC = require("../models/dbcModel");
+const BDC = require("../models/bdcModel");
 const { getAll, getOne, createOne, updateOne } = require("./helperController");
 
 exports.getAllBDC = getAll(BDC);
