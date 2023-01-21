@@ -14,6 +14,7 @@ const bdcSchema = new mongoose.Schema({
   },
 });
 
+
 bdcSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema

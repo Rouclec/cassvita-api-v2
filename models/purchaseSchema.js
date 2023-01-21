@@ -40,5 +40,10 @@ purchaseSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
+purchaseSchema.pre(/^find/, function (next) {
+  this.populate('farmer').populate('bdc').populate('driver');
+  next();
+});
+
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 module.exports = Purchase;

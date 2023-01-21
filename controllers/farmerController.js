@@ -12,8 +12,6 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
   const communityId = await Community.findOne({ name: community });
 
-  console.log("community: ", communityId);
-
   if (!communityId) {
     return next(
       res.status(404).json({
