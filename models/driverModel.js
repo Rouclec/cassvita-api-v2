@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const driverSchema = new mongoose.Schema({
   name: {
@@ -11,6 +12,10 @@ const driverSchema = new mongoose.Schema({
     validate: [validator.isMobilePhone, "Please enter a valid phone number"],
   },
 });
+
+driverSchema.plugin(uniqueValidator, {
+  message: "{PATH} {VALUE} already in use, please try another!",
+}); //enable beautifying on this schema
 
 const Driver = mongoose.model("Driver", driverSchema);
 module.exports = Driver;

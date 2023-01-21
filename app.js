@@ -33,8 +33,24 @@ app.use(express.json({ limit: "10kb" }));
 
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
+const driverRouter = require("./routes/driverRoutes");
+const farmerRouter = require("./routes/farmerRoutes");
+const communityRouter = require("./routes/communityRoutes");
+const roleRouter = require("./routes/roleRoutes");
+const purchaseRouter = require("./routes/purchaseRoutes");
+const purchaseItemRouter = require("./routes/purchaseItemRoutes");
+const bdcRouter = require("./routes/bdcRoutes");
+const purhcaseStateChangeRouter = require("./routes/purchaseStateChangeRoutes");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/driver", driverRouter);
+app.use("/api/v1/farmer", farmerRouter);
+app.use("/api/v1/community", communityRouter);
+app.use("/api/v1/role", roleRouter);
+app.use("/api/v1/purchase", purchaseRouter);
+app.use("/api/v1/purchase-item", purchaseItemRouter);
+app.use("/api/v1/bdc", bdcRouter);
+app.use("/api/v1/purchase-state-change", purhcaseStateChangeRouter);
 
 module.exports = app;

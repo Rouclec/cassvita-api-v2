@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const farmerSchema = new mongoose.Schema({
   name: {
@@ -15,6 +16,18 @@ const farmerSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Community",
   },
+});
+
+farmerSchema.plugin(uniqueValidator, {
+  message: "{PATH} {VALUE} already in use, please try another!",
+}); //enable beautifying on this schema
+
+farmerSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "community",
+    select: "-__v -_id",
+  });
+  next();
 });
 
 const Farmer = mongoose.model("Farmer", farmerSchema);

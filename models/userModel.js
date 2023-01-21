@@ -67,6 +67,15 @@ userSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
+//virtualPopulate
+userSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "role",
+    select: "code -_id",
+  });
+  next();
+});
+
 //Pre method runs before a user object is 'saved'
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); //if the password has not been modified, go to the next middleware
