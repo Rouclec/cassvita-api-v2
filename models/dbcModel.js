@@ -7,7 +7,7 @@ const bdcSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide the name for this bdc"],
   },
-  id: String,
+  id: { type: String, unique: true },
   size: {
     type: Number,
     required: [true, "Please enter the size for this BDC"],
@@ -19,7 +19,7 @@ bdcSchema.plugin(uniqueValidator, {
 }); //enable beautifying on this schema
 
 bdcSchema.pre("save", function (next) {
-  this.id = uuid();
+  this.id = uuid().replaceAll("-", "").slice(0, 7);
   next();
 });
 const BDC = mongoose.model("bdc", bdcSchema);
