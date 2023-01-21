@@ -19,7 +19,7 @@ bdcSchema.plugin(uniqueValidator, {
 }); //enable beautifying on this schema
 
 bdcSchema.pre("save", function (next) {
-  this.id = uuid().replaceAll("-", "").slice(0, 7);
+  this.id = uuid().slice(0, 7);
   next();
 });
 const BDC = mongoose.model("bdc", bdcSchema);
