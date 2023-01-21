@@ -14,7 +14,6 @@ const bdcSchema = new mongoose.Schema({
   },
 });
 
-
 bdcSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
@@ -23,5 +22,5 @@ bdcSchema.pre("save", function (next) {
   this.id = uuid().slice(0, 7);
   next();
 });
-const BDC = mongoose.model("bdc", bdcSchema);
+const BDC = mongoose.model("BDC", bdcSchema);
 module.exports = BDC;
