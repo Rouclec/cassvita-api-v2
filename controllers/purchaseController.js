@@ -1,4 +1,4 @@
-const Purchase = require("../models/purchaseSchema");
+const Purchase = require("../models/purchaseModel");
 const { createOne, getOne, getAll, updateOne } = require("./helperController");
 const Farmer = require("../models/farmerModel");
 const Driver = require("../models/driverModel");
