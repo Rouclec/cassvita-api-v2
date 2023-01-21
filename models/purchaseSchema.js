@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const purchaseSchema = new mongoose.Schema({
   farmer: {
@@ -38,6 +39,11 @@ const purchaseSchema = new mongoose.Schema({
 purchaseSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
+
+purchaseSchema.pre(/^find/, function (next) {
+  this.populate('farmer').populate('bdc').populate('driver');
+  next();
+});
 
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 module.exports = Purchase;
