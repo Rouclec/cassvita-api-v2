@@ -22,7 +22,7 @@ exports.deleteOne = (Model) =>
 exports.updateOne = (Model, params) =>
   catchAsync(async (req, res) => {
     let body = {};
-    params.forEach((param) => (body[param] = req.body[param]));
+    params.forEach((param) => (body[param] = req.body[param] || null));
     const updatedDoc = await Model.findByIdAndUpdate(req.params.id, body, {
       new: true,
       runValidators: true,
@@ -38,7 +38,7 @@ exports.updateOne = (Model, params) =>
 exports.createOne = (Model, params) =>
   catchAsync(async (req, res) => {
     let body = {};
-    params.forEach((param) => (body[param] = req.body[param] || null));
+    params.forEach((param) => (body[param] = req.body[param]));
     const newDoc = await Model.create(req.body);
 
     res.status(201).json({

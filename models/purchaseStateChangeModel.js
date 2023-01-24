@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const purhcaseStateChangeSchema = new mongoose.Schema({
+const purchaseStateChangeSchema = new mongoose.Schema({
   purchase: {
     type: mongoose.Schema.ObjectId,
     ref: "Purchase",
@@ -18,12 +18,20 @@ const purhcaseStateChangeSchema = new mongoose.Schema({
   },
 });
 
-purhcaseStateChangeSchema.plugin(uniqueValidator, {
+purchaseStateChangeSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
-const purhcaseStateChange = mongoose.model(
-  "purhcaseStateChange",
-  purhcaseStateChangeSchema
+purchaseStateChangeSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "purchase",
+    select: "-__v -_id -farmer -driver -bdc",
+  });
+  next();
+});
+
+const PurchaseStateChange = mongoose.model(
+  "PurchaseStateChange",
+  purchaseStateChangeSchema
 );
-module.exports = purhcaseStateChange;
+module.exports = PurchaseStateChange;
