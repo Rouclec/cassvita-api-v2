@@ -13,6 +13,9 @@ const communitySchema = new mongoose.Schema({
     required: [true, "Enter the location of this community"],
     unique: true,
   },
+  cassavaSpecies: {
+    type: String,
+  },
   communityHead: {
     name: {
       type: String,
