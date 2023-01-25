@@ -12,6 +12,10 @@ const farmerSchema = new mongoose.Schema({
     validate: [validator.isMobilePhone, "Please enter a valid phone number"],
   },
   dateOfBirth: Date,
+  sex: {
+    type: String
+  },
+  farmSize: Number,
   community: {
     type: mongoose.Schema.ObjectId,
     ref: "Community",

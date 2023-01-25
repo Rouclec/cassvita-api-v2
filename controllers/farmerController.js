@@ -6,9 +6,9 @@ const { getAll, getOne, createOne } = require("./helperController");
 exports.getAllFarmers = getAll(Farmer);
 exports.getFarmer = getOne(Farmer);
 
-// add new Driver
+// add new Farmer
 exports.createFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, dateOfBirth, community } = req.body;
+  const { name, phoneNumber, sex, farmSize, dateOfBirth, community } = req.body;
 
   const communityId = await Community.findOne({ name: community });
 
@@ -23,6 +23,8 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
   const farmer = {
     name,
+    sex,
+    farmSize,
     phoneNumber,
     dateOfBirth: new Date(dateOfBirth),
     community: communityId._id,
@@ -41,12 +43,14 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
 //Update Driver
 exports.updateFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, dateOfBirth, community } = req.body || null;
+  const { name, phoneNumber, sex, farmSize, dateOfBirth, community } = req.body || null;
 
   const communityId = await Community.find({ name: community });
 
   const farmer = {
     name,
+    sex,
+    farmSize,
     phoneNumber,
     dateOfBirth,
     community: communityId._id,
