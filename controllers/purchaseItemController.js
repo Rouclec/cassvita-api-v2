@@ -11,7 +11,6 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
   const {purchase, driversWeight, officeWeight,} = req.body;
 
   const purchaseId = await Purchase.findOne({ name: purchase });
-  const driverId = await Driver.findOne({ name: driver });
   
 
 
@@ -23,17 +22,8 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
       })
     );
   }
-  if (!driverId) {
-    return next(
-      res.status(404).json({
-        status: "Not Found",
-        message: `Driver ${driver} not found`,
-      })
-    );
-  }
 
   const purchaseItem = {
-    driver: driverId._id,
     purchase: purchaseId._id,
     officeWeight,
     driversWeight,
@@ -51,11 +41,9 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseItem = getAll(purchaseItem);
 exports.getPurchaseItem = getOne(Item);
 exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
-  const { driver, officeWeight, purchase, driversWeight } = req.body;
+  const { officeWeight, purchase, driversWeight } = req.body;
 
   const purchaseId = await purchase.findOne({ name: purchase });
-  const driverId = await Driver.findOne({ name: driver });
-
 
   if (!purchaseId) {
     return next(
@@ -65,17 +53,8 @@ exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
       })
     );
   }
-  if (!driverId) {
-    return next(
-      res.status(404).json({
-        status: "Not Found",
-        message: `Driver ${driver} not found`,
-      })
-    );
-  }
 
   const purchaseItem = {
-    driver: driver._id,
     purchase: farmer._id,
     officeWeight,
     driversWeight
