@@ -51,7 +51,7 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseItem = getAll(purchaseItem);
 exports.getPurchaseItem = getOne(Item);
 exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
-  const { driver, officeWeight, purchase } = req.body;
+  const { driver, officeWeight, purchase, driversWeight } = req.body;
 
   const purchaseId = await purchase.findOne({ name: purchase });
   const driverId = await Driver.findOne({ name: driver });
@@ -78,6 +78,7 @@ exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
     driver: driver._id,
     purchase: farmer._id,
     officeWeight,
+    driversWeight
   };
 
   const newPurchaseItem = await purchaseItem.findByIdAndUpdate(req.params.id,purchaseItem);
