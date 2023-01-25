@@ -15,9 +15,7 @@ const farmerSchema = new mongoose.Schema({
   sex: {
     type: String
   },
-  farmSize: {
-    type: String
-  },
+  farmSize: Number,
   community: {
     type: mongoose.Schema.ObjectId,
     ref: "Community",
