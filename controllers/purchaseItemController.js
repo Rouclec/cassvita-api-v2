@@ -36,6 +36,7 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
     driver: driverId._id,
     purchase: purchaseId._id,
     officeWeight,
+    driversWeight,
   };
 
   const newPurchaseItem = await purchaseItem.create(purchaseItem);
