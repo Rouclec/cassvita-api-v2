@@ -16,7 +16,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     return next(
       res.status(404).json({
         status: "Not Found",
-        message: `Community ${communityId._id} not found`,
+        message: `Community ${community} not found`,
       })
     );
   }
