@@ -15,6 +15,7 @@ const signToken = (id) => {
 };
 const createAuthToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  console.log("signing token for user with id: ", user._id);
   user.password = undefined; //to remove the password field
 
   const cookieOptions = {
@@ -111,6 +112,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 2) verify token
+  console.log("Token: ", token);
   const verifiedToken = await promisify(jwt.verify)(
     token,
     process.env.JWT_SECRET
@@ -124,8 +126,10 @@ exports.protect = catchAsync(async (req, res, next) => {
     });
   }
 
+  console.log("verfied token: ", verifiedToken);
   //4) check if user exists
   const user = await User.findById(verifiedToken.id);
+  console.log("user found: ", user);
   if (!user) {
     return res.status(401).json({
       status: "Unauthorized",
