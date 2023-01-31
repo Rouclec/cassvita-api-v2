@@ -4,6 +4,7 @@ const { createOne, getOne, getAll, updateOne } = require("./helperController");
 exports.createCommunity = createOne(Community, [
   "name",
   "location",
+  "cassavaSpecies",
   "communityHead",
   "unitPrice",
 ]);
@@ -12,6 +13,7 @@ exports.getCommunity = getOne(Community);
 exports.updateCommunity = updateOne(Community, [
   "name",
   "location",
+  "cassavaSpecies",
   "communityHead",
   "unitPrice",
 ]);
