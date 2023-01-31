@@ -1,18 +1,14 @@
-const Purchase = require("../models/purchaseSchema");
-const { createOne, getOne, getAll, updateOne } = require("./helperController");
+const Purchase = require("../models/purchaseModel");
+const PurchaseItem = require("../models/purchaseItemModel");
 const Driver = require("../models/driverModel");
+const { createOne, getOne, getAll, updateOne } = require("./helperController");
 const catchAsync = require("../utils/catchAsync");
-const purchaseItem = require("../models/purchaseItemSchema");
-
-
 
 // add new Purchase
 exports.createPurchaseItem = catchAsync(async (req, res, next) => {
-  const {purchase, driversWeight, officeWeight,} = req.body;
+  const { purchase, driversWeight, officeWeight } = req.body;
 
   const purchaseId = await Purchase.findOne({ name: purchase });
-  
-
 
   if (!purchaseId) {
     return next(
@@ -29,7 +25,7 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
     driversWeight,
   };
 
-  const newPurchaseItem = await purchaseItem.create(purchaseItem);
+  const newPurchaseItem = await PurchaseItem.create(purchaseItem);
 
   return next(
     res.status(201).json({
@@ -38,8 +34,8 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
     })
   );
 });
-exports.getAllPurchaseItem = getAll(purchaseItem);
-exports.getPurchaseItem = getOne(Item);
+exports.getAllPurchaseItem = getAll(PurchaseItem);
+exports.getPurchaseItem = getOne(PurchaseItem);
 exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
   const { officeWeight, purchase, driversWeight } = req.body;
 
@@ -57,10 +53,13 @@ exports.updatePurchaseItem = catchAsync(async (req, res, next) => {
   const purchaseItem = {
     purchase: farmer._id,
     officeWeight,
-    driversWeight
+    driversWeight,
   };
 
-  const newPurchaseItem = await purchaseItem.findByIdAndUpdate(req.params.id,purchaseItem);
+  const newPurchaseItem = await purchaseItem.findByIdAndUpdate(
+    req.params.id,
+    purchaseItem
+  );
 
   return next(
     res.status(200).json({
