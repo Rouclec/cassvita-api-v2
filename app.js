@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 const corsOptions = {
-  origin: "https://cassvita-test-app-git-master-fonkwe.vercel.app",
+  origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
