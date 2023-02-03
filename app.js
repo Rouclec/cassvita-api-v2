@@ -10,6 +10,7 @@ const corsOptions = {
     "http://localhost:3001",
     "https://cassvita-test-app-git-master-fonkwe.vercel.app",
     "https://cassvita.vercel.app",
+    "https://app.cassvita.com",
   ],
   credentials: true,
   optionSuccessStatus: 200,
