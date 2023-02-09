@@ -16,6 +16,11 @@ const purchaseOrderSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please enter the size for this purchase order"],
   },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
   bdc: {
     filename: String,
     data: { type: Buffer, contentType: String },
@@ -26,7 +31,13 @@ purchaseOrderSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
-purchaseOrderSchema.pre("save", function (next) {
+purchaseOrderSchema.pre("save", async function (next) {
+  const activePOs = await PurchaseOrder.find({ status: "active" });
+  if (activePOs) {
+    activePOs.forEach(async (po) => {
+      await PurchaseOrder.findByIdAndUpdate(po._id, { status: "inactive" });
+    });
+  }
   this.id = uuid().slice(0, 7);
   next();
 });
