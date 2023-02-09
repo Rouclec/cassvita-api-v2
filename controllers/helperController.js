@@ -29,9 +29,7 @@ exports.updateOne = (Model, params) =>
     });
     res.status(200).json({
       status: "Updated",
-      data: {
-        doc: updatedDoc,
-      },
+      data: updatedDoc,
     });
   });
 
@@ -43,9 +41,7 @@ exports.createOne = (Model, params) =>
 
     res.status(201).json({
       status: "Created",
-      data: {
-        doc: newDoc,
-      },
+      data: newDoc,
     });
   });
 
@@ -64,9 +60,7 @@ exports.getOne = (Model) =>
 
     res.status(200).json({
       status: "Success",
-      data: {
-        doc,
-      },
+      data: doc,
     });
   });
 
@@ -77,8 +71,6 @@ exports.getAll = (Model) =>
     res.status(200).json({
       status: "Success",
       results: docs.length,
-      data: {
-        docs,
-      },
+      data: docs,
     });
   });
