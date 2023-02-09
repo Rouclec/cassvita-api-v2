@@ -2,18 +2,18 @@ const Purchase = require("../models/purchaseModel");
 const { createOne, getOne, getAll, updateOne } = require("./helperController");
 const Farmer = require("../models/farmerModel");
 const Driver = require("../models/driverModel");
-const BDC = require("../models/bdcModel");
+const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
 
 
 
 // add new Purchase
 exports.createPurchase = catchAsync(async (req, res, next) => {
-  const { driver, totalWeight, totalAmount, bdc, farmer } = req.body;
+  const { driver, totalWeight, totalAmount, PurchaseOrder, farmer } = req.body;
 
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
-  const bdcId = await BDC.findOne({ id: bdc });
+  const PurchaseOrderId = await PurchaseOrder.findOne({ id: PurchaseOrder });
 
 
   if (!farmerId) {
@@ -32,18 +32,18 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       })
     );
   }
-  if (!bdcId) {
+  if (!PurchaseOrderId) {
     return next(
       res.status(404).json({
         status: "Not Found",
-        message: `BDC ${bdc} not found`,
+        message: `PurchaseOrder ${PurchaseOrder} not found`,
       })
     );
   }
 
   const purchase = {
     driver: driverId._id,
-    bdc: bdcId._id,
+    PurchaseOrder: PurchaseOrderId._id,
     farmer: farmerId._id,
     totalWeight,
     totalAmount,
@@ -62,11 +62,11 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 exports.getAllPurchase = getAll(Purchase);
 exports.getPurchase = getOne(Purchase);
 exports.updatePurchase = catchAsync(async (req, res, next) => {
-  const { driver, totalWeight, totalAmount, bdc, farmer } = req.body;
+  const { driver, totalWeight, totalAmount, PurchaseOrder, farmer } = req.body;
 
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
-  const bdcId = await BDC.findOne({ name: bdc });
+  const PurchaseOrderId = await PurchaseOrder.findOne({ name: PurchaseOrder });
 
 
   if (!farmerId) {
@@ -85,18 +85,18 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
       })
     );
   }
-  if (!bdcId) {
+  if (!PurchaseOrderId) {
     return next(
       res.status(404).json({
         status: "Not Found",
-        message: `BDC ${bdc} not found`,
+        message: `PurchaseOrder ${PurchaseOrder} not found`,
       })
     );
   }
 
   const purchase = {
     driver: driver._id,
-    bdc: bdc._id,
+    PurchaseOrder: PurchaseOrder._id,
     farmer: farmer._id,
     totalWeight,
     totalAmount

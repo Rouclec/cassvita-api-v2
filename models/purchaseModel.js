@@ -24,10 +24,10 @@ const purchaseSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  bdc: {
+  PurchaseOrder: {
     type: mongoose.Schema.ObjectId,
-    ref: "BDC",
-    required: [true, "Each purchase must belong to a BDC"],
+    ref: "PurchaseOrder",
+    required: [true, "Each purchase must belong to a PurchaseOrder"],
   },
   state: {
     type: String,
@@ -48,7 +48,7 @@ purchaseSchema.pre(/^find/, function (next) {
     path: "driver",
     select: "-__v -_id",
   }).populate({
-    path: "bdc",
+    path: "PurchaseOrder",
     select: "-__v -_id",
   });
   next();

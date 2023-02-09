@@ -18,7 +18,7 @@ purchaseItemSchema.plugin(uniqueValidator, {
 purchaseItemSchema.pre(/^find/, function (next) {
   this.populate({
     path: "purchase",
-    select: "-__v -_id -farmer -driver -bdc",
+    select: "-__v -_id -farmer -driver -PurchaseOrder",
   });
   next();
 });

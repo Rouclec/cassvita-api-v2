@@ -45,7 +45,7 @@ const communityRouter = require("./routes/communityRoutes");
 const roleRouter = require("./routes/roleRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
 const purchaseItemRouter = require("./routes/purchaseItemRoutes");
-const bdcRouter = require("./routes/bdcRoutes");
+const purchaseOrderRouter = require("./routes/purchaseOrderRoutes");
 const purhcaseStateChangeRouter = require("./routes/purchaseStateChangeRoutes");
 
 app.use("/api/v1/auth", authRouter);
@@ -56,7 +56,7 @@ app.use("/api/v1/community", communityRouter);
 app.use("/api/v1/role", roleRouter);
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/purchase-item", purchaseItemRouter);
-app.use("/api/v1/bdc", bdcRouter);
+app.use("/api/v1/purchase-order", purchaseOrderRouter);
 app.use("/api/v1/purchase-state-change", purhcaseStateChangeRouter);
 
 module.exports = app;
