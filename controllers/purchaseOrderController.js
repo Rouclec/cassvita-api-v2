@@ -63,12 +63,13 @@ exports.getPurchaseOrder = getOne(PurchaseOrder);
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   if (req.file) req.body.bdc = req.file.filename;
 
-  const { title, quantity, amount } = req.body;
+  const { title, quantity, amount, duration } = req.body;
 
   const purchaseOrder = await PurchaseOrder.create({
     title,
     quantity,
     amount,
+    duration,
     bdc: { filename: req.body.bdc, data: req.file.buffer },
   });
 
@@ -84,12 +85,13 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
   if (req.file) req.body.bdc = req.file.filename;
 
-  const { title, quantity, amount } = req.body;
+  const { title, quantity, amount, duration } = req.body;
 
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
     title,
     quantity,
     amount,
+    duration,
     bdc: req.file.buffer,
   });
 

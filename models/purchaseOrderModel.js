@@ -21,6 +21,7 @@ const purchaseOrderSchema = new mongoose.Schema({
     enum: ["active", "inactive"],
     default: "active",
   },
+  duration: Number,
   bdc: {
     filename: String,
     data: { type: Buffer, contentType: String },
