@@ -25,6 +25,8 @@ exports.uploadBdc = upload.single("bdc");
 exports.resizePhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
+  console.log("request file: ", req.file);
+
   req.file.filename = `bdc-${Date.now()}.jpeg`;
 
   await sharp(req.file.buffer)
@@ -85,14 +87,21 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
   if (req.file) req.body.bdc = req.file.filename;
 
+  let bdc;
   const { title, quantity, amount, duration } = req.body;
+
+  if (req.file) {
+    bdc = req.file.buffer;
+  } else {
+    bdc = undefined;
+  }
 
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
     title,
     quantity,
     amount,
     duration,
-    bdc: req.file.buffer,
+    bdc,
   });
 
   next(
