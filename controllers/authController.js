@@ -52,6 +52,7 @@ exports.addUser = catchAsync(async (req, res, next) => {
     email,
     password,
     passwordConfirm,
+    createdBy: req.user._id,
     role: userRole._id,
   };
 

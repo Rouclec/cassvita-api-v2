@@ -8,6 +8,7 @@ const {
   uploadBdc,
   resizePhoto,
   closePurchaseOrder,
+  purchaseOrderStats,
 } = require("../controllers/purchaseOrderController");
 const router = express.Router();
 
@@ -21,6 +22,11 @@ router
     resizePhoto,
     createPurchaseOrder
   );
+
+router
+  .route("/stats")
+  .get(restrictTo("admin", "ceo", "manager"), purchaseOrderStats);
+
 router
   .route("/:id")
   .get(restrictTo("admin", "ceo", "manager"), getPurchaseOrder)
@@ -31,10 +37,8 @@ router
     updatePurchaseOrder
   );
 
-router.patch(
-  "/:id/close",
-  restrictTo("admin", "ceo", "manager"),
-  closePurchaseOrder
-);
+router
+  .route("/:id/close")
+  .patch(restrictTo("admin", "ceo", "manager"), closePurchaseOrder);
 
 module.exports = router;

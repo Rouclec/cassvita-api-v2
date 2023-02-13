@@ -28,6 +28,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     dateOfBirth: new Date(dateOfBirth),
     community: communityId._id,
+    createdBy: req.user._id,
   };
 
   console.log("farmer: ", farmer);

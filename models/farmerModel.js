@@ -20,6 +20,10 @@ const farmerSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Community",
   },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 farmerSchema.plugin(uniqueValidator, {

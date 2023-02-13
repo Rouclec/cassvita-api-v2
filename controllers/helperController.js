@@ -35,7 +35,9 @@ exports.updateOne = (Model, params) =>
 
 exports.createOne = (Model, params) =>
   catchAsync(async (req, res) => {
-    let body = {};
+    let body = {
+      createdBy: req.user._id,
+    };
     params.forEach((param) => (body[param] = req.body[param]));
     const newDoc = await Model.create(req.body);
 

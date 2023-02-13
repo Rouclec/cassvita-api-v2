@@ -11,6 +11,10 @@ const driverSchema = new mongoose.Schema({
     type: String,
     validate: [validator.isMobilePhone, "Please enter a valid phone number"],
   },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 driverSchema.plugin(uniqueValidator, {

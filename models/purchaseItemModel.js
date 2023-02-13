@@ -9,6 +9,10 @@ const purchaseItemSchema = new mongoose.Schema({
   },
   driversWeight: Number,
   officeWeight: Number,
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 purchaseItemSchema.plugin(uniqueValidator, {

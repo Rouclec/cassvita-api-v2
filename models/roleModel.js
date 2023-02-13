@@ -11,6 +11,10 @@ const roleSchema = new mongoose.Schema({
   code: {
     type: String,
   },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 roleSchema.plugin(uniqueValidator, {

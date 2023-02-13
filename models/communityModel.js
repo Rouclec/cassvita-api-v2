@@ -27,6 +27,10 @@ const communitySchema = new mongoose.Schema({
     },
   },
   unitPrice: Number,
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 communitySchema.plugin(uniqueValidator, {

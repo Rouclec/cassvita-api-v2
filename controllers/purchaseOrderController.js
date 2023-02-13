@@ -40,25 +40,23 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseOrder = getAll(PurchaseOrder);
 exports.getPurchaseOrder = getOne(PurchaseOrder);
 
-// exports.getPurchaseOrder = catchAsync(async (req, res, next) => {
-//   const po = await PurchaseOrder.findById(req.params.id);
+exports.getPurchaseOrder = catchAsync(async (req, res, next) => {
+  const po = await PurchaseOrder.findById(req.params.id);
 
-//   console.log("po: ", po);
+  // await sharp(po.bdc.data)
+  //   .resize(500, 500) //reizes the image to 500x500
+  //   .toFormat("jpeg") //converts the image to a jpeg format
+  //   .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
+  //   // .toBuffer();
+  //   .toFile(`public/img/bdc/${po.bdc.filename}`);
 
-//   await sharp(po.bdc.data)
-//     .resize(500, 500) //reizes the image to 500x500
-//     .toFormat("jpeg") //converts the image to a jpeg format
-//     .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
-//     // .toBuffer();
-//     .toFile(`public/img/bdc/${po.bdc.filename}`);
-
-//   return next(
-//     res.status(200).json({
-//       status: "OK",
-//       data: po,
-//     })
-//   );
-// });
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: po,
+    })
+  );
+});
 
 // add new PurchaseOrder
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
@@ -72,6 +70,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
     startDate,
     endDate,
     bdc: { filename: req.body.bdc, data: req.file.buffer },
+    createdBy: req.user._id,
   });
 
   next(
@@ -122,4 +121,27 @@ exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
       data: purchaseOrder,
     })
   );
+});
+
+exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
+  const stats = await PurchaseOrder.aggregate([
+    {
+      $match: { quantity: { $gte: 600 } },
+    },
+    {
+      $group: {
+        _id: "",
+        totalCassavaPurchase: { $sum: "$quantity" },
+        highest: { $max: "$quantity" },
+        lowest: { $min: "quantity" },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "Success",
+    data: {
+      stats,
+    },
+  });
 });

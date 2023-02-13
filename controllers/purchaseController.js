@@ -47,7 +47,8 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     farmer: farmerId._id,
     totalWeight,
     totalAmount,
-    unitPrice: farmerId.community.unitPrice
+    unitPrice: farmerId.community.unitPrice,
+    createdBy: req.user._id,
   };
 
   const newPurchase = await Purchase.create(purchase);

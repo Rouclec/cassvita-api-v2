@@ -34,6 +34,10 @@ const purchaseSchema = new mongoose.Schema({
     enum: ["New", "Paid", "Confirmed"],
     default: "New",
   },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
 purchaseSchema.plugin(uniqueValidator, {

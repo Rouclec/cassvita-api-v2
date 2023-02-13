@@ -23,6 +23,7 @@ exports.createPurchaseItem = catchAsync(async (req, res, next) => {
     purchase: purchaseId._id,
     officeWeight,
     driversWeight,
+    createdBy: req.user._id,
   };
 
   const newPurchaseItem = await PurchaseItem.create(purchaseItem);
