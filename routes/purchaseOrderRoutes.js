@@ -7,6 +7,7 @@ const {
   updatePurchaseOrder,
   uploadBdc,
   resizePhoto,
+  closePurchaseOrder,
 } = require("../controllers/purchaseOrderController");
 const router = express.Router();
 
@@ -29,5 +30,11 @@ router
     resizePhoto,
     updatePurchaseOrder
   );
+
+router.patch(
+  "/:id/close",
+  restrictTo("admin", "ceo", "manager"),
+  closePurchaseOrder
+);
 
 module.exports = router;

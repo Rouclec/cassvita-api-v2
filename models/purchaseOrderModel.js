@@ -3,10 +3,6 @@ const { uuid } = require("uuidv4");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const purchaseOrderSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, "Please provide a title for this purchase order"],
-  },
   id: { type: String, unique: true },
   quantity: {
     type: Number,
@@ -21,7 +17,8 @@ const purchaseOrderSchema = new mongoose.Schema({
     enum: ["active", "inactive"],
     default: "active",
   },
-  duration: Number,
+  startDate: Date,
+  endDate: Date,
   bdc: {
     filename: String,
     data: { type: Buffer, contentType: String },
@@ -39,7 +36,7 @@ purchaseOrderSchema.pre("save", async function (next) {
       await PurchaseOrder.findByIdAndUpdate(po._id, { status: "inactive" });
     });
   }
-  this.id = uuid().slice(0, 7);
+  this.id = `PO-${uuid().slice(0, 5)}`;
   next();
 });
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);

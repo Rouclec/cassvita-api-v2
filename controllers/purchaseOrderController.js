@@ -34,7 +34,6 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     // .toFormat("jpeg") //converts the image to a jpeg format
     .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
     .toBuffer();
-  // .toFile(`public/img/bdc/${req.file.filename}`);
   next();
 });
 
@@ -65,13 +64,13 @@ exports.getPurchaseOrder = getOne(PurchaseOrder);
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   if (req.file) req.body.bdc = req.file.filename;
 
-  const { title, quantity, amount, duration } = req.body;
+  const { quantity, amount, startDate, endDate } = req.body;
 
   const purchaseOrder = await PurchaseOrder.create({
-    title,
     quantity,
     amount,
-    duration,
+    startDate,
+    endDate,
     bdc: { filename: req.body.bdc, data: req.file.buffer },
   });
 
@@ -88,7 +87,7 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
   if (req.file) req.body.bdc = req.file.filename;
 
   let bdc;
-  const { title, quantity, amount, duration } = req.body;
+  const { quantity, amount, startDate, endDate } = req.body;
 
   if (req.file) {
     bdc = req.file.buffer;
@@ -97,11 +96,24 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
   }
 
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
-    title,
     quantity,
     amount,
-    duration,
+    startDate,
+    endDate,
     bdc,
+  });
+
+  next(
+    res.status(200).json({
+      status: "Updated",
+      data: purchaseOrder,
+    })
+  );
+});
+
+exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
+  const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
+    status: "inactive",
   });
 
   next(
