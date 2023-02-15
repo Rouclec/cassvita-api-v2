@@ -25,8 +25,6 @@ exports.uploadBdc = upload.single("bdc");
 exports.resizePhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
-  console.log("request file: ", req.file);
-
   req.file.filename = `bdc-${Date.now()}.jpeg`;
 
   await sharp(req.file.buffer)
@@ -124,18 +122,24 @@ exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
+  // const stats = await PurchaseOrder.aggregate([
+  //   {
+  //     $match: { quantity: { $gte: 600 } },
+  //   },
+  //   {
+  //     $group: {
+  //       _id: "",
+  //       totalCassavaPurchase: { $sum: "$quantity" },
+  //       highest: { $max: "$quantity" },
+  //       lowest: { $min: "quantity" },
+  //     },
+  //   },
+  // ]);
+
   const stats = await PurchaseOrder.aggregate([
-    {
-      $match: { quantity: { $gte: 600 } },
-    },
-    {
-      $group: {
-        _id: "",
-        totalCassavaPurchase: { $sum: "$quantity" },
-        highest: { $max: "$quantity" },
-        lowest: { $min: "quantity" },
-      },
-    },
+    { $sort: { quantity: req.body.sort } },
+    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
+    { $replaceWith: "$doc_with_max_ver" },
   ]);
 
   res.status(200).json({

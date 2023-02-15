@@ -5,16 +5,13 @@ const Driver = require("../models/driverModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
 
-
-
 // add new Purchase
 exports.createPurchase = catchAsync(async (req, res, next) => {
-  const { driver, totalWeight, totalAmount, PurchaseOrder, farmer } = req.body;
+  const { driver, totalWeight, totalAmount, purchaseOrder, farmer } = req.body;
 
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
-  const PurchaseOrderId = await PurchaseOrder.findOne({ id: PurchaseOrder });
-
+  const purchaseOrderId = await PurchaseOrder.findOne({ id: purchaseOrder });
 
   if (!farmerId) {
     return next(
@@ -32,7 +29,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       })
     );
   }
-  if (!PurchaseOrderId) {
+  if (!purchaseOrderId) {
     return next(
       res.status(404).json({
         status: "Not Found",
@@ -43,7 +40,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 
   const purchase = {
     driver: driverId._id,
-    PurchaseOrder: PurchaseOrderId._id,
+    purchaseOrder: purchaseOrderId._id,
     farmer: farmerId._id,
     totalWeight,
     totalAmount,
@@ -68,7 +65,6 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
   const PurchaseOrderId = await PurchaseOrder.findOne({ name: PurchaseOrder });
-
 
   if (!farmerId) {
     return next(
@@ -100,10 +96,10 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
     PurchaseOrder: PurchaseOrder._id,
     farmer: farmer._id,
     totalWeight,
-    totalAmount
+    totalAmount,
   };
 
-  const newPurchase = await Purchase.findByIdAndUpdate(req.params.id,purchase);
+  const newPurchase = await Purchase.findByIdAndUpdate(req.params.id, purchase);
 
   return next(
     res.status(200).json({
@@ -111,4 +107,30 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
       data: newPurchase,
     })
   );
+});
+
+exports.stats = catchAsync(async (req, res, next) => {
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+
+  const stats = await Purchase.aggregate([
+    {
+      $match: {
+        $and: [{ month: { $eq: thisMonth } }, { year: { $eq: thisYear } }],
+      },
+    },
+    {
+      $group: {
+        _id: "",
+        totalCassavaPurchase: { $sum: "$totalWeight" },
+        totalAmount: { $sum: "$totalAmount" },
+        numberOfPurchases: { $sum: 1 },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "OK",
+    data: stats,
+  });
 });
