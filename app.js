@@ -47,9 +47,11 @@ const purchaseRouter = require("./routes/purchaseRoutes");
 const purchaseItemRouter = require("./routes/purchaseItemRoutes");
 const purchaseOrderRouter = require("./routes/purchaseOrderRoutes");
 const purhcaseStateChangeRouter = require("./routes/purchaseStateChangeRoutes");
+const procurementRouter = require("./routes/procurementRoutes");
+const paymentRouter = require("./routes/paymentRoutes");
 
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/user", userRouter);
 app.use("/api/v1/driver", driverRouter);
 app.use("/api/v1/farmer", farmerRouter);
 app.use("/api/v1/community", communityRouter);
@@ -58,5 +60,7 @@ app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/purchase-item", purchaseItemRouter);
 app.use("/api/v1/purchase-order", purchaseOrderRouter);
 app.use("/api/v1/purchase-state-change", purhcaseStateChangeRouter);
+app.use("/api/v1/procurement", procurementRouter);
+app.use("/api/v1/payment", paymentRouter);
 
 module.exports = app;

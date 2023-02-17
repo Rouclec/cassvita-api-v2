@@ -81,6 +81,7 @@ exports.getAll = (Model) =>
       .paginate();
     const docs = await features.query;
 
+    console.log("docs: ", docs);
     res.status(200).json({
       status: "Success",
       results: docs.length,

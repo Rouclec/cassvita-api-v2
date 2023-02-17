@@ -122,30 +122,27 @@ exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
-  // const stats = await PurchaseOrder.aggregate([
-  //   {
-  //     $match: { quantity: { $gte: 600 } },
-  //   },
-  //   {
-  //     $group: {
-  //       _id: "",
-  //       totalCassavaPurchase: { $sum: "$quantity" },
-  //       highest: { $max: "$quantity" },
-  //       lowest: { $min: "quantity" },
-  //     },
-  //   },
-  // ]);
-
-  const stats = await PurchaseOrder.aggregate([
-    { $sort: { quantity: req.body.sort } },
+  let lowest = await PurchaseOrder.aggregate([
+    { $sort: { quantity: 1 } },
     { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
     { $replaceWith: "$doc_with_max_ver" },
   ]);
 
+  let highest = await PurchaseOrder.aggregate([
+    { $sort: { quantity: -1 } },
+    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
+    { $replaceWith: "$doc_with_max_ver" },
+  ]);
+
+  lowest[0].bdc = undefined;
+  highest[0].bdc = undefined;
+
+  let data = {
+    lowestPO: lowest[0],
+    highestPO: highest[0],
+  };
   res.status(200).json({
     status: "Success",
-    data: {
-      stats,
-    },
+    data,
   });
 });

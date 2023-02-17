@@ -8,25 +8,30 @@ const purchaseOrderSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: [true, "Please enter the size for this purchase order"],
+      select: false,
     },
     amount: {
       type: Number,
       required: [true, "Please enter the size for this purchase order"],
+      select: false,
     },
     status: {
       type: String,
       enum: ["active", "inactive"],
       default: "active",
+      select: false,
     },
     startDate: Date,
     endDate: Date,
     bdc: {
       filename: String,
       data: { type: Buffer, contentType: String },
+      select: false,
     },
     createdBy: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
+      select: false,
     },
   },
   {
@@ -58,7 +63,7 @@ purchaseOrderSchema.pre("save", async function (next) {
 purchaseOrderSchema.pre(/^find/, function (next) {
   this.populate({
     path: "createdBy",
-    select: "-email -username -role -lastLogin",
+    select: "fullName -_id",
   });
   next();
 });

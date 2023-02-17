@@ -26,6 +26,13 @@ const purchaseSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    totalBags: {
+      type: Number,
+      default: 0,
+    },
+    paymentMethod: {
+      type: String,
+    },
     purchaseOrder: {
       type: mongoose.Schema.ObjectId,
       ref: "PurchaseOrder",
@@ -74,35 +81,11 @@ purchaseSchema.pre(/^find/, function (next) {
     })
     .populate({
       path: "purchaseOrder",
-      select: "-__v",
+      select: "id _id startDate endDate",
     });
   next();
 });
 
-purchaseSchema.statics.calculateFarmerTotal = async function (farmerId) {
-  const stats = await this.aggregate([
-    {
-      $match: { farmer: farmerId },
-    },
-    {
-      $group: {
-        _id: "$farmer", //group all purchases with thesame,
-        totalPay: { $sum: "$totalAmount" }, //add 1 for each review document which matches
-        totalWeight: { $sum: "$totalWeight" }, //get the average rating of all the docs that match
-      },
-    },
-  ]);
-  if (stats.length > 0) {
-    await Farmer.findByIdAndUpdate(farmerId, {
-      totalPay: stats[0].totalPay,
-      totalWeight: stats[0].totalWeight,
-    });
-  }
-};
-
-purchaseSchema.post("save", function () {
-  this.constructor.calculateFarmerTotal(this.farmer);
-});
 
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 module.exports = Purchase;

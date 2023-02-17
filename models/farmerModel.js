@@ -34,6 +34,10 @@ const farmerSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    totalBags: {
+      type: Number,
+      default: 0,
+    },
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -60,7 +64,7 @@ farmerSchema.plugin(uniqueValidator, {
 farmerSchema.pre(/^find/, function (next) {
   this.populate({
     path: "community",
-    select: "-__v -_id",
+    select: "name -_id unitPrice",
   });
   next();
 });
