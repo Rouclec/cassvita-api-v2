@@ -53,8 +53,6 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
       })
     );
   }
-//   console.log("community: ", community);
-//   console.log('price per kilo: ',pricePerKilo, ' total')
   const procurement = {
     driver: driverId._id,
     purchaseOrder: purchaseOrderId._id,

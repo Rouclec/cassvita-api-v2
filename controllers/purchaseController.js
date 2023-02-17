@@ -72,6 +72,9 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   };
 
   await Payment.create(payment);
+  await PurchaseOrder.findByIdAndUpdate(purchaseOrderId._id, {
+    totalPayments: purchaseOrderId.totalPayments + 1,
+  });
   const newPurchase = await Purchase.create(purchase);
 
   return next(

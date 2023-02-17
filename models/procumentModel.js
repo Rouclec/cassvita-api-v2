@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
+const PurchaseOrder = require("./purchaseOrderModel");
 
 const procurementSchema = new mongoose.Schema({
   purchaseOrder: {
@@ -56,6 +57,31 @@ const procurementSchema = new mongoose.Schema({
 procurementSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
+
+//Static middle ware to calculate payments and procurements for a certain PO
+procurementSchema.statics.calculate = async function (purchaseOrderId) {
+  const stats = await this.aggregate([
+    {
+      $match: { purchaseOrder: purchaseOrderId },
+    },
+    {
+      $group: {
+        _id: "$purchaseOrder", //group all procurements with thesame purchase order,
+        totalProcurements: { $sum: 1 }, //add 1 for each procurement document which matches
+        // totalWeight: { $sum: "$totalWeight" }, //
+      },
+    },
+  ]);
+  if (stats.length > 0) {
+    await PurchaseOrder.findByIdAndUpdate(purchaseOrderId, {
+      totalProcurements: stats[0].totalProcurements,
+    });
+  }
+};
+
+procurementSchema.post("save", function () {
+  this.constructor.calculate(this.purchaseOrder);
+});
 
 procurementSchema.pre(/^find/, function (next) {
   this.populate({

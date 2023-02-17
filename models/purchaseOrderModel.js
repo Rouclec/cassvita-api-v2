@@ -33,6 +33,14 @@ const purchaseOrderSchema = new mongoose.Schema(
       ref: "User",
       select: false,
     },
+    totalProcurements: {
+      type: Number,
+      default: 0,
+    },
+    totalPayments: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     toJSON: { virtuals: true },
