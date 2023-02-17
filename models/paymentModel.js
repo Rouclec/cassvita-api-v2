@@ -40,6 +40,10 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    purchaseOrderId: {
+      type: String,
+      select: false,
+    },
   },
   {
     toObject: { virtuals: true },
