@@ -137,9 +137,12 @@ exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
   lowest[0].bdc = undefined;
   highest[0].bdc = undefined;
 
+  let currentPurchaseOrder = await PurchaseOrder.findOne({ status: "active" });
+
   let data = {
     lowestPO: lowest[0],
     highestPO: highest[0],
+    currentPurchaseOrder,
   };
   res.status(200).json({
     status: "Success",
