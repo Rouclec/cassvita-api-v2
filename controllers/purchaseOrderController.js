@@ -73,7 +73,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
   next(
     res.status(201).json({
-      status: "Created",
+      status: "OK",
       data: purchaseOrder,
     })
   );
@@ -102,7 +102,7 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
 
   next(
     res.status(200).json({
-      status: "Updated",
+      status: "OK",
       data: purchaseOrder,
     })
   );
@@ -115,7 +115,7 @@ exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
 
   next(
     res.status(200).json({
-      status: "Updated",
+      status: "OK",
       data: purchaseOrder,
     })
   );
@@ -145,7 +145,7 @@ exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
     currentPurchaseOrder,
   };
   res.status(200).json({
-    status: "Success",
+    status: "OK",
     data,
   });
 });

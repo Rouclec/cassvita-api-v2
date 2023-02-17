@@ -35,7 +35,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
   return next(
     res.status(201).json({
-      status: "Farmer Created!",
+      status: "OK",
       data: newFarmer,
     })
   );
@@ -60,7 +60,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
 
   return next(
     res.status(200).json({
-      status: "Farmer Updated!",
+      status: "OK",
       data: newFarmer,
     })
   );

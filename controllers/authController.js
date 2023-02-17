@@ -60,8 +60,8 @@ exports.addUser = catchAsync(async (req, res, next) => {
 
   return next(
     res.status(201).json({
-      status: "User Created!",
-      user,
+      status: "OK",
+      data: user,
     })
   );
 });
@@ -190,7 +190,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).json({
-    status: "Sent",
+    status: "OK",
     message: `Follow the link sent to ${req.body.email} within 10 minutes to reset your password`,
   });
 });

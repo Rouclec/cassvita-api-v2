@@ -43,7 +43,7 @@ exports.createOne = (Model, params) =>
     const newDoc = await Model.create(req.body);
 
     res.status(201).json({
-      status: "Created",
+      status: "OK",
       data: newDoc,
     });
   });
@@ -67,7 +67,7 @@ exports.getOne = (Model, populateOptions, selectOptions) =>
     }
 
     res.status(200).json({
-      status: "Success",
+      status: "OK",
       data: doc,
     });
   });
@@ -81,7 +81,7 @@ exports.getAll = (Model) =>
       .paginate();
     const docs = await features.query;
     res.status(200).json({
-      status: "Success",
+      status: "OK",
       results: docs.length,
       data: docs,
     });

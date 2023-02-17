@@ -68,7 +68,7 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
   const newProcurement = await Procurement.create(procurement);
   return next(
     res.status(201).json({
-      status: "Created!",
+      status: "OK",
       data: newProcurement,
     })
   );
@@ -151,7 +151,7 @@ exports.updateProcurement = catchAsync(async (req, res, next) => {
   );
   return next(
     res.status(201).json({
-      status: "Created!",
+      status: "OK",
       data: newProcurement,
     })
   );
