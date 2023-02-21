@@ -13,26 +13,6 @@ const s3 = new aws.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
-// const uploadFile = (bdcName) => {
-//   let path;
-//   fs.readFile(`public/img/bdc/bdc.jpeg`, async (err, data) => {
-//     if (err) throw err;
-//     const params = {
-//       Bucket: "cassvitastorage", // pass your bucket name
-//       Key: `${bdcName}`, // file will be saved as cassvitastorage/bdcName.jpeg
-//       Body: JSON.stringify(data, null, 2),
-//     };
-//     await s3
-//       .upload(params, function (s3Err, data) {
-//         if (s3Err) throw s3Err;
-//         console.log(`File uploaded successfully at ${data.Location}`);
-//         path = data.Location;
-//         console.log(`data return : ${data}`);
-//       })
-//       .promise();
-//   });
-//   return path;
-// };
 
 const uploadFile = (bdcName) => {
   return new Promise((resolve, reject) => {
@@ -82,7 +62,6 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     .resize(500, 500) //reizes the image to 500x500
     .toFormat("jpeg") //converts the image to a jpeg format
     .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
-    // .toBuffer();
     .toFile(`public/img/bdc/bdc.jpeg`);
 
   res = await uploadFile(`public/img/bdc/${req.file.originalname}`);
@@ -94,31 +73,9 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseOrder = getAll(PurchaseOrder);
 exports.getPurchaseOrder = getOne(PurchaseOrder);
 
-// exports.getPurchaseOrder = catchAsync(async (req, res, next) => {
-//   const po = await PurchaseOrder.findById(req.params.id);
 
-// await sharp(po.bdc.data)
-//   .resize(500, 500) //reizes the image to 500x500
-//   .toFormat("jpeg") //converts the image to a jpeg format
-//   .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
-//   // .toBuffer();
-//   .toFile(`public/img/bdc/${po.bdc.filename}`);
-
-//   return next(
-//     res.status(200).json({
-//       status: "OK",
-//       data: po,
-//     })
-//   );
-// });
-
-// add new PurchaseOrder
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
-  // if (req.file) req.body.bdc = req.file.filename;
 
-  // console.log("request body: ", req.body);
-
-  // uploadBdc(req.body.bdc);
 
   const { quantity, amount, startDate, endDate } = req.body;
 
@@ -141,13 +98,12 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
 //Update PurchaseOrder
 exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
-  if (req.file) req.body.bdc = req.file.filename;
 
   let bdc;
   const { quantity, amount, startDate, endDate } = req.body;
 
-  if (req.file) {
-    bdc = req.file.buffer;
+  if (req.bdc) {
+    bdc = req.bdc
   } else {
     bdc = undefined;
   }
