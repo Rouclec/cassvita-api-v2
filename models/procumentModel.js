@@ -1,24 +1,18 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const PurchaseOrder = require("./purchaseOrderModel");
+const { uuid } = require("uuidv4");
 
 const procurementSchema = new mongoose.Schema({
-  purchaseOrder: {
-    type: mongoose.Schema.ObjectId,
-    ref: "PurchaseOrder",
-  },
-  community: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Community",
-  },
-  driver: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Driver",
-  },
+  id: String,
+  purchaseOrder: String,
+  community: String,
+  driver: String,
   createdAt: {
     type: Date,
     default: Date.now(),
   },
+  date: Date,
   farmLocation: {
     type: String,
   },
@@ -73,11 +67,17 @@ procurementSchema.statics.calculate = async function (purchaseOrderId) {
     },
   ]);
   if (stats.length > 0) {
-    await PurchaseOrder.findByIdAndUpdate(purchaseOrderId, {
+    const poFound = await PurchaseOrder.findOne({ id: purchaseOrderId });
+    await PurchaseOrder.findByIdAndUpdate(poFound._id, {
       totalProcurements: stats[0].totalProcurements,
     });
   }
 };
+
+procurementSchema.pre("save", async function (next) {
+  this.id = `P-${uuid().slice(0, 3)}`;
+  next();
+});
 
 procurementSchema.post("save", function () {
   this.constructor.calculate(this.purchaseOrder);

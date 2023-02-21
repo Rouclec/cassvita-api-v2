@@ -22,7 +22,7 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
   } = req.body;
 
   const driverId = await Driver.findOne({ name: driver });
-  const purchaseOrderId = await PurchaseOrder.findById(purchaseOrder);
+  const purchaseOrderId = await PurchaseOrder.findOne({id: purchaseOrder});
   if (community) {
     const communityId = await Community.findOne({ name: community });
     if (!communityId) {
@@ -54,12 +54,13 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     );
   }
   const procurement = {
-    driver: driverId._id,
-    purchaseOrder: purchaseOrderId._id,
+    driver,
+    purchaseOrder,
     totalWeight,
     totalAmount: totalWeight * pricePerKilo * 1,
     farmLocation,
     pricePerKilo,
+    community,
     purchases,
     date,
     totalBags,

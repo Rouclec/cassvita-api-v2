@@ -5,10 +5,10 @@ const {
   createPurchaseOrder,
   getPurchaseOrder,
   updatePurchaseOrder,
-  uploadBdc,
   resizePhoto,
   closePurchaseOrder,
   purchaseOrderStats,
+  uploadBdc,
 } = require("../controllers/purchaseOrderController");
 const router = express.Router();
 
@@ -32,8 +32,8 @@ router
   .get(restrictTo("admin", "ceo", "manager"), getPurchaseOrder)
   .patch(
     restrictTo("admin", "ceo", "manager"),
-    uploadBdc,
-    resizePhoto,
+    // uploadBdc,
+    // resizePhoto,
     updatePurchaseOrder
   );
 

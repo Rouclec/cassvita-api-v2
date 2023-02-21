@@ -20,10 +20,7 @@ const purchaseOrderSchema = new mongoose.Schema(
     },
     startDate: Date,
     endDate: Date,
-    bdc: {
-      filename: String,
-      data: { type: Buffer, contentType: String },
-    },
+    bdc: String,
     createdBy: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -60,7 +57,7 @@ purchaseOrderSchema.pre("save", async function (next) {
       await PurchaseOrder.findByIdAndUpdate(po._id, { status: "inactive" });
     });
   }
-  this.id = `PO-${uuid().slice(0, 5)}`;
+  this.id = `PO-${uuid().slice(0, 3)}`;
   next();
 });
 purchaseOrderSchema.pre(/^find/, function (next) {
