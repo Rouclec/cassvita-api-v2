@@ -13,12 +13,11 @@ const s3 = new aws.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
-
 const uploadFile = (bdcName) => {
   return new Promise((resolve, reject) => {
     try {
       const file = fs.readFileSync(`public/img/bdc/bdc.jpeg`);
-      const BUCKET = "cassvitastorage";
+      const BUCKET = process.env.AWS_BUCKET;
 
       const uploadParams = {
         Bucket: BUCKET,
@@ -64,7 +63,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
     .toFile(`public/img/bdc/bdc.jpeg`);
 
-  res = await uploadFile(`public/img/bdc/${req.file.originalname}`);
+  res = await uploadFile(`${req.file.originalname}`);
   req.bdc = res.Location;
 
   next();
@@ -73,10 +72,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseOrder = getAll(PurchaseOrder);
 exports.getPurchaseOrder = getOne(PurchaseOrder);
 
-
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
-
-
   const { quantity, amount, startDate, endDate } = req.body;
 
   const purchaseOrder = await PurchaseOrder.create({
@@ -98,12 +94,11 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
 //Update PurchaseOrder
 exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
-
   let bdc;
   const { quantity, amount, startDate, endDate } = req.body;
 
   if (req.bdc) {
-    bdc = req.bdc
+    bdc = req.bdc;
   } else {
     bdc = undefined;
   }
