@@ -83,7 +83,9 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
     receipt = req.receipt;
   }
 
-  const paymentFound = await Payment.findById(id).select("+purchaseOrderId");
+  const paymentFound = await Payment.findOne({ id: id }).select(
+    "+purchaseOrderId"
+  );
 
   if (!paymentFound) {
     return res.status(404).json({
@@ -128,7 +130,7 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
     });
   }
 
-  const payment = await Payment.findByIdAndUpdate(id, {
+  const payment = await Payment.findByIdAndUpdate(paymentFound._id, {
     receipt,
     status,
     updatedBy: req.user._id,

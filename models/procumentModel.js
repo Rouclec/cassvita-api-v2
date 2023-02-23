@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const PurchaseOrder = require("./purchaseOrderModel");
-const { uuid } = require("uuidv4");
+const { v4: uuidv4 } = require("uuid");
 
 const procurementSchema = new mongoose.Schema({
   id: String,
@@ -75,7 +75,7 @@ procurementSchema.statics.calculate = async function (purchaseOrderId) {
 };
 
 procurementSchema.pre("save", async function (next) {
-  this.id = `P-${uuid().slice(0, 3)}`;
+  this.id = `P-${uuidv4().slice(0, 3)}`;
   next();
 });
 

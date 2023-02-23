@@ -17,9 +17,6 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     totalBags,
     paymentMethod,
   } = req.body;
-
-  console.log("request body: ", req.body);
-
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
   const purchaseOrderId = await PurchaseOrder.findOne({ id: purchaseOrder });
@@ -34,7 +31,6 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   }
 
   if (farmerId.community) {
-    console.log("farmerId: ", farmerId);
     unitPrice = farmerId.community.unitPrice;
   }
   if (!driverId) {
@@ -76,7 +72,15 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     createdBy: req.user._id,
   };
 
-  await Payment.create(payment);
+  const paymentCreated = await Payment.create(payment);
+  if (!paymentCreated) {
+    return next(
+      res.status(500).json({
+        status: "Server Error",
+        message: "Something went wrong",
+      })
+    );
+  }
   const newPurchase = await Purchase.create(purchase);
 
   return next(

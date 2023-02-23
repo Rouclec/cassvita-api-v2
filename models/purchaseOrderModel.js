@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { uuid } = require("uuidv4");
+const { v4: uuidv4} = require("uuid");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const purchaseOrderSchema = new mongoose.Schema(
@@ -57,7 +57,7 @@ purchaseOrderSchema.pre("save", async function (next) {
       await PurchaseOrder.findByIdAndUpdate(po._id, { status: "inactive" });
     });
   }
-  this.id = `PO-${uuid().slice(0, 3)}`;
+  this.id = `PO-${uuidv4().slice(0, 3)}`;
   next();
 });
 purchaseOrderSchema.pre(/^find/, function (next) {
