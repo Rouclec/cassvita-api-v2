@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
+const { uuid } = require("uuidv4");
 
 const paymentSchema = new mongoose.Schema(
   {
+    id: String,
     farmer: {
       type: mongoose.Schema.ObjectId,
       ref: "Farmer",
@@ -44,6 +46,8 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
+    updatedOn: Date,
+    receipt: String,
   },
   {
     toObject: { virtuals: true },
@@ -61,6 +65,10 @@ paymentSchema.pre(/^find/, function (next) {
     select: "name _id",
   });
   next();
+});
+
+paymentSchema.pre(/^save/, function (next) {
+  this.id = `PA-${uuid().slice(0, 5)}`;
 });
 
 const Payment = mongoose.model("Payment", paymentSchema);

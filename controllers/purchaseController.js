@@ -18,6 +18,8 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     paymentMethod,
   } = req.body;
 
+  console.log("request body: ", req.body);
+
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
   const purchaseOrderId = await PurchaseOrder.findOne({ id: purchaseOrder });
@@ -30,7 +32,9 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       })
     );
   }
+
   if (farmerId.community) {
+    console.log("farmerId: ", farmerId);
     unitPrice = farmerId.community.unitPrice;
   }
   if (!driverId) {

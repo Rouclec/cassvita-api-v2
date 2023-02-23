@@ -14,7 +14,9 @@ router.use(protect);
 router
   .route("/")
   .get(getAllPurchase)
-  .post(restrictTo("admin", "manager", "ceo"), createPurchase);
+  .post(
+    restrictTo("admin", "manager", "ceo"), 
+    createPurchase);
 
 router.get("/stats", restrictTo("admin", "manager", "ceo"), stats);
 

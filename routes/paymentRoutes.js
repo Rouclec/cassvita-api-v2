@@ -4,6 +4,8 @@ const {
   getAllPayments,
   getPayment,
   changePaymentStatus,
+  uploadReceipt,
+  resizePhoto,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
@@ -15,6 +17,8 @@ router.get("/:id", getPayment);
 router.patch(
   "/:id/:status",
   restrictTo("admin", "manager", "ceo"),
+  uploadReceipt,
+  resizePhoto,
   changePaymentStatus
 );
 

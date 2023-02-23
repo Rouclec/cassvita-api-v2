@@ -8,7 +8,7 @@ exports.getFarmer = getOne(Farmer);
 
 // add new Farmer
 exports.createFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, sex, farmSize, dateOfBirth, community } = req.body;
+  const { name, phoneNumber, sex, farmSize, dateOfBirth, community, paymentMethod } = req.body;
 
   const communityId = await Community.findOne({ name: community });
 
@@ -43,7 +43,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
 //Update Driver
 exports.updateFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, sex, farmSize, dateOfBirth, community } =
+  const { name, phoneNumber, sex, farmSize, dateOfBirth, community, paymentMethod } =
     req.body || null;
 
   const communityId = await Community.find({ name: community });
