@@ -34,7 +34,7 @@ const uploadFile = (bdcName) => {
         }
       });
     } catch (error) {
-      return reject(err);
+      return reject(error);
     }
   });
 };

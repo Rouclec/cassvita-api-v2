@@ -26,6 +26,7 @@ const farmerSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    profilePic: String,
     totalPay: {
       type: Number,
       default: 0,

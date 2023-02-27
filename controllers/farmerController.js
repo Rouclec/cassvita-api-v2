@@ -3,12 +3,93 @@ const Farmer = require("../models/farmerModel");
 const catchAsync = require("../utils/catchAsync");
 const { getAll, getOne, createOne } = require("./helperController");
 
+const multer = require("multer");
+const sharp = require("sharp");
+const fs = require("fs");
+const aws = require("aws-sdk");
+
+const multerStorage = multer.memoryStorage();
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const uploadFile = (profilePicName) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const file = fs.readFileSync(
+        `public/img/farmer-profile-pic/profile.jpeg`
+      );
+      const BUCKET = process.env.AWS_BUCKET;
+
+      const uploadParams = {
+        Bucket: BUCKET,
+        Key: `${profilePicName}`,
+        Body: file,
+      };
+
+      s3.upload(uploadParams, function (err, data) {
+        if (err) {
+          return reject(err);
+        }
+        if (data) {
+          return resolve(data);
+        }
+      });
+    } catch (error) {
+      return reject(error);
+    }
+  });
+};
+
+const multerFilter = (req, file, cbFxn) => {
+  if (file.mimetype.startsWith("image")) {
+    cbFxn(null, true);
+  } else {
+    cbFxn("Error: Not an image! Please upload only images", false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadProfilePic = upload.single("profilePic");
+
+exports.resizePhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  await sharp(req.file.buffer)
+    .resize(500, 500) //reizes the image to 500x500
+    .toFormat("jpeg") //converts the image to a jpeg format
+    .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
+    .toFile(`public/img/farmer-profile-pic/profile.jpeg`);
+
+  res = await uploadFile(`${req.file.originalname}`);
+  req.profilePic = res.Location;
+  next();
+});
+
 exports.getAllFarmers = getAll(Farmer);
 exports.getFarmer = getOne(Farmer);
 
 // add new Farmer
 exports.createFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, sex, farmSize, dateOfBirth, community, paymentMethod } = req.body;
+  const {
+    name,
+    phoneNumber,
+    sex,
+    farmSize,
+    dateOfBirth,
+    community,
+    paymentMethod,
+  } = req.body;
+
+  let profilePic = undefined;
+
+  if (req.profilePic) {
+    profilePic = req.profilePic;
+  }
 
   const communityId = await Community.findOne({ name: community });
 
@@ -26,6 +107,8 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     sex,
     farmSize,
     phoneNumber,
+    paymentMethod,
+    profilePic,
     dateOfBirth: new Date(dateOfBirth),
     community: communityId._id,
     createdBy: req.user._id,
@@ -43,8 +126,21 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
 //Update Driver
 exports.updateFarmer = catchAsync(async (req, res, next) => {
-  const { name, phoneNumber, sex, farmSize, dateOfBirth, community, paymentMethod } =
-    req.body || null;
+  const {
+    name,
+    phoneNumber,
+    sex,
+    farmSize,
+    dateOfBirth,
+    community,
+    paymentMethod,
+  } = req.body || null;
+
+  let profilePic = undefined;
+
+  if (req.profilePic) {
+    profilePic = req.profilePic;
+  }
 
   const communityId = await Community.find({ name: community });
 
@@ -54,6 +150,8 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     farmSize,
     phoneNumber,
     dateOfBirth,
+    profilePic,
+    paymentMethod,
     community: communityId._id,
   };
   const newFarmer = await Farmer.findById(req.params.id, farmer);

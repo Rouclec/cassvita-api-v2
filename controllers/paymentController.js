@@ -36,7 +36,7 @@ const uploadFile = (receiptName) => {
         }
       });
     } catch (error) {
-      return reject(err);
+      return reject(error);
     }
   });
 };
