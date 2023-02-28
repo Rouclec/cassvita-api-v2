@@ -39,6 +39,6 @@ router
 
 router
   .route("/:id/close")
-  .patch(restrictTo("admin", "ceo", "manager"), closePurchaseOrder);
+  .get(restrictTo("admin", "ceo", "manager"), closePurchaseOrder);
 
 module.exports = router;
