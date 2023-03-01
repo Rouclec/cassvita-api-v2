@@ -78,7 +78,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
   const {
     name,
     phoneNumber,
-    sex,
+    gender,
     farmSize,
     dateOfBirth,
     community,
@@ -104,7 +104,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
   const farmer = {
     name,
-    sex,
+    gender,
     farmSize,
     phoneNumber,
     paymentMethod,
@@ -129,7 +129,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
   const {
     name,
     phoneNumber,
-    sex,
+    gender,
     farmSize,
     dateOfBirth,
     community,
@@ -146,7 +146,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
 
   const farmer = {
     name,
-    sex,
+    gender,
     farmSize,
     phoneNumber,
     dateOfBirth,
