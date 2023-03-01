@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const { v4: uuidv4 } = require("uuid");
+const Farmer = require("./farmerModel");
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -64,6 +65,28 @@ paymentSchema.pre(/^find/, function (next) {
     select: "name _id",
   });
   next();
+});
+
+paymentSchema.statics.addAmountOwed = async function (farmer, amount) {
+  const farmerFound = await Farmer.findById(farmer);
+  await Farmer.findByIdAndUpdate(farmer, {
+    amountOwed: farmerFound.amountOwed + amount,
+  });
+};
+
+paymentSchema.statics.subtractAmountOwed = async function (farmer, amount) {
+  const farmerFound = await Farmer.findById(farmer);
+  await Farmer.findByIdAndUpdate(farmer, {
+    amountOwed: farmerFound.amountOwed - amount,
+  });
+};
+
+paymentSchema.post("save", async function () {
+  await this.constructor.addAmountOwed(this.farmer, this.amount);
+});
+
+paymentSchema.post("findOneAndUpdate", async function (doc) {
+  await doc.constructor.subtractAmountOwed(doc.farmer, doc.amount);
 });
 
 paymentSchema.pre(/^save/, function (next) {

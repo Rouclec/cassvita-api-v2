@@ -35,6 +35,10 @@ const farmerSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    amountOwed: {
+      type: Number,
+      default: 0,
+    },
     totalBags: {
       type: Number,
       default: 0,
@@ -63,7 +67,7 @@ farmerSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
-farmerSchema.pre(/^find/, function (next) {
+farmerSchema.pre(/^find/, async function (next) {
   this.populate({
     path: "community",
     select: "name -_id unitPrice",
