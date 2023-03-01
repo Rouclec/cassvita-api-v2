@@ -184,8 +184,8 @@ exports.stats = catchAsync(async (req, res, next) => {
 
   communities.forEach((community) => {
     totalFarmers += community.total;
-    if (community._id === true) fromCommunity = community.total;
-    if (community._id === false) individual = community.total;
+    if (community._id === true) fromCommunity = community?.total || 0;
+    if (community._id === false) individual = community?.total || 0;
   });
 
   const genderGroup = await Farmer.aggregate([
@@ -198,8 +198,8 @@ exports.stats = catchAsync(async (req, res, next) => {
   ]);
 
   genderGroup.forEach((gender) => {
-    if (gender._id === "M") males = gender.total;
-    if (gender._id === "F") females = gender.total;
+    if (gender._id === "M") males = gender?.total || 0;
+    if (gender._id === "F") females = gender?.total || 0;
   });
 
   const newFarmers = await Farmer.aggregate([
@@ -235,8 +235,8 @@ exports.stats = catchAsync(async (req, res, next) => {
   ]);
 
   activeFarmers.forEach((farmer) => {
-    if (farmer._id) active = farmer.total;
-    if (!farmer._id) inactive = farmer.total;
+    if (farmer._id) active = farmer?.total || 0;
+    if (!farmer._id) inactive = farmer?.total || 0;
   });
 
   let response = {
@@ -247,7 +247,7 @@ exports.stats = catchAsync(async (req, res, next) => {
     females,
     active,
     inactive,
-    newFarmers: newFarmers[0].total,
+    newFarmers: newFarmers[0]?.total || 0,
     highestPaid: highestPaid[0],
     lowestPaid: lowestPaid[0],
   };
