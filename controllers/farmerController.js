@@ -214,16 +214,9 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  const highestPaid = await Farmer.aggregate([
-    { $sort: { totalPay: -1 } },
-    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
-    { $replaceWith: "$doc_with_max_ver" },
-  ]);
-  const lowestPaid = await Farmer.aggregate([
-    { $sort: { totalPay: 1 } },
-    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
-    { $replaceWith: "$doc_with_max_ver" },
-  ]);
+  const sortedFarmers = await Farmer.find().sort("-amount");
+  const highestPaid = sortedFarmers[0]
+  const lowestPaid = sortedFarmers[(sortedFarmers.length - 1)]
 
   const activeFarmers = await Farmer.aggregate([
     {
@@ -248,8 +241,8 @@ exports.stats = catchAsync(async (req, res, next) => {
     active,
     inactive,
     newFarmers: newFarmers[0]?.total || 0,
-    highestPaid: highestPaid[0],
-    lowestPaid: lowestPaid[0],
+    highestPaid: highestPaid,
+    lowestPaid: lowestPaid,
   };
 
   res.status(200).json({
