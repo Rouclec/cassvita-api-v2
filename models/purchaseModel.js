@@ -86,6 +86,5 @@ purchaseSchema.pre(/^find/, function (next) {
   next();
 });
 
-
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 module.exports = Purchase;

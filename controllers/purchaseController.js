@@ -5,6 +5,7 @@ const Driver = require("../models/driverModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
 const Payment = require("../models/paymentModel");
+const Procurement = require("../models/procumentModel");
 
 // add new Purchase
 exports.createPurchase = catchAsync(async (req, res, next) => {
@@ -83,6 +84,10 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   }
   const newPurchase = await Purchase.create(purchase);
 
+  await Payment.findByIdAndUpdate(paymentCreated._id, {
+    purchase: newPurchase._id,
+  });
+
   return next(
     res.status(201).json({
       status: "OK",
@@ -93,11 +98,19 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 exports.getAllPurchase = getAll(Purchase);
 exports.getPurchase = getOne(Purchase);
 exports.updatePurchase = catchAsync(async (req, res, next) => {
-  const { driver, totalWeight, totalAmount, PurchaseOrder, farmer } = req.body;
+  const {
+    driver,
+    totalWeight,
+    totalBags,
+    totalAmount,
+    purchaseOrder,
+    farmer,
+    paymentMethod,
+  } = req.body;
 
   const farmerId = await Farmer.findOne({ name: farmer });
   const driverId = await Driver.findOne({ name: driver });
-  const PurchaseOrderId = await PurchaseOrder.findOne({ name: PurchaseOrder });
+  const PurchaseOrderId = await PurchaseOrder.findOne({ id: purchaseOrder });
 
   if (!farmerId) {
     return next(
@@ -169,3 +182,5 @@ exports.stats = catchAsync(async (req, res, next) => {
     data: stats,
   });
 });
+
+

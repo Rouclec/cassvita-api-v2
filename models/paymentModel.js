@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const { v4: uuidv4 } = require("uuid");
 const Farmer = require("./farmerModel");
+const Purchase = require("./purchaseModel");
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -17,6 +18,10 @@ const paymentSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
+    },
+    purchase: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Purchase",
     },
     totalWeight: {
       type: Number,

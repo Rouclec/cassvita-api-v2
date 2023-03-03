@@ -8,6 +8,8 @@ const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
+const Purchase = require("../models/purchaseModel");
+const Procurement = require("../models/procumentModel");
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -94,12 +96,12 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
     });
   }
 
-  if (paymentFound.status !== "Pending") {
-    return res.status(500).json({
-      status: "Serer error",
-      message: "Something went wrong",
-    });
-  }
+  // if (paymentFound.status !== "Pending") {
+  //   return res.status(500).json({
+  //     status: "Serer error",
+  //     message: "Something went wrong",
+  //   });
+  // }
 
   if (status === "Paid") {
     const farmerFound = await Farmer.findById(paymentFound.farmer._id);
@@ -109,6 +111,7 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
         message: "Something went wrong",
       });
     }
+
     await Farmer.findByIdAndUpdate(farmerFound._id, {
       totalPay: farmerFound.totalPay + paymentFound.amount,
       totalBags: farmerFound.totalBags + paymentFound.totalBags,
@@ -128,6 +131,16 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
       totalPayments: purchaseOrderFound.totalPayments + 1,
       purchaseOrderId: null,
     });
+
+    const purchaseFound = await Purchase.findById(paymentFound.purchase);
+    if (!purchaseFound) {
+      return res.status(500).json({
+        status: "Server error",
+        message: "Something went wrong",
+      });
+    }
+
+    await Purchase.findByIdAndUpdate(purchaseFound.id, { state: "Paid" });
   }
 
   const payment = await Payment.findByIdAndUpdate(paymentFound._id, {

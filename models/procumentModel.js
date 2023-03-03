@@ -83,6 +83,21 @@ procurementSchema.post("save", function () {
   this.constructor.calculate(this.purchaseOrder);
 });
 
+procurementSchema.post(/^findOne/, async function (doc) {
+  console.log("this document: ", this);
+  if (doc.status === "open") {
+    let status = "open";
+    let completed = doc.purchases.every(
+      (purchase) => purchase.state === "Paid"
+    );
+
+    console.log("completed: ", completed);
+    // if (completed)
+    doc.status = "closed";
+    this.update(doc);
+  }
+});
+
 procurementSchema.pre(/^find/, function (next) {
   this.populate({
     path: "driver",

@@ -71,7 +71,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllFarmers = getAll(Farmer);
-exports.getFarmer = getOne(Farmer);
+exports.getFarmer = getOne(Farmer, "community");
 
 // add new Farmer
 exports.createFarmer = catchAsync(async (req, res, next) => {
