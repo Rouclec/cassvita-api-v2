@@ -76,8 +76,8 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   const { quantity, amount, startDate, endDate } = req.body;
 
   const purchaseOrder = await PurchaseOrder.create({
-    quantity,
-    amount,
+    quantity: quantity * 1,
+    amount: amount * 1,
     startDate,
     endDate,
     bdc: req.bdc,
@@ -104,8 +104,8 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
   }
 
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
-    quantity,
-    amount,
+    quantity: quantity * 1,
+    amount: amount * 1,
     startDate,
     endDate,
     bdc,
