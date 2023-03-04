@@ -67,13 +67,12 @@ farmerSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
-// farmerSchema.pre(/^find/, async function (next) {
-//   this.populate({
-//     path: "community",
-//     select: "name -_id unitPrice",
-//   });
-//   next();
-// });
+farmerSchema.pre(/^find/, async function (next) {
+  this.populate({
+    path: "community",
+  });
+  next();
+});
 
 const Farmer = mongoose.model("Farmer", farmerSchema);
 module.exports = Farmer;
