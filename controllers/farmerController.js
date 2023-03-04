@@ -85,10 +85,12 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     paymentMethod,
   } = req.body;
 
-  let profilePic = undefined;
+  let profilePic;
 
   if (req.profilePic) {
     profilePic = req.profilePic;
+  } else {
+    profilePic = undefined;
   }
 
   const communityId = await Community.findOne({ name: community });
@@ -136,6 +138,8 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     paymentMethod,
   } = req.body || null;
 
+  console.log("edit request body: ", req.body);
+
   let profilePic = undefined;
 
   if (req.profilePic) {
@@ -154,7 +158,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     paymentMethod,
     community: communityId._id,
   };
-  const newFarmer = await Farmer.findById(req.params.id, farmer);
+  const newFarmer = await Farmer.findByIdAndUpdate(req.params.id, farmer);
 
   return next(
     res.status(200).json({
@@ -215,8 +219,8 @@ exports.stats = catchAsync(async (req, res, next) => {
   ]);
 
   const sortedFarmers = await Farmer.find().sort("-amount");
-  const highestPaid = sortedFarmers[0]
-  const lowestPaid = sortedFarmers[(sortedFarmers.length - 1)]
+  const highestPaid = sortedFarmers[0];
+  const lowestPaid = sortedFarmers[sortedFarmers.length - 1];
 
   const activeFarmers = await Farmer.aggregate([
     {
