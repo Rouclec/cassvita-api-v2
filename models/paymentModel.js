@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const { v4: uuidv4 } = require("uuid");
 const Farmer = require("./farmerModel");
-const Purchase = require("./purchaseModel");
+const Procurement = require("./procumentModel");
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -19,15 +19,15 @@ const paymentSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
     },
-    purchase: {
+    procurement: {
       type: mongoose.Schema.ObjectId,
-      ref: "Purchase",
+      ref: "Procurement",
     },
-    totalWeight: {
+    weight: {
       type: Number,
       default: 0,
     },
-    totalBags: {
+    bags: {
       type: Number,
       default: 0,
     },
@@ -48,8 +48,9 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    purchaseOrderId: {
-      type: String,
+    purchaseOrder: {
+      type: mongoose.Schema.ObjectId,
+      ref: "PurchaseOrder",
     },
     updatedOn: Date,
     receipt: String,
@@ -86,12 +87,27 @@ paymentSchema.statics.subtractAmountOwed = async function (farmer, amount) {
   });
 };
 
+paymentSchema.statics.closeProcurement = async function (procurementId) {
+  const procurementFound = await Procurement.findById(procurementId);
+  const paymentsFound = await Payment.find({ procurement: procurementId });
+
+  let paidFully = true;
+
+  paymentsFound.forEach((payment) => {
+    if (payment.status === "Pending") paidFully = false;
+  });
+
+  if (paidFully === true)
+    await Procurement.findByIdAndUpdate(procurementId, { status: "closed" });
+};
+
 paymentSchema.post("save", async function () {
   await this.constructor.addAmountOwed(this.farmer, this.amount);
 });
 
 paymentSchema.post("findOneAndUpdate", async function (doc) {
   await doc.constructor.subtractAmountOwed(doc.farmer, doc.amount);
+  await doc.constructor.closeProcurement(doc.procurement);
 });
 
 paymentSchema.pre(/^save/, function (next) {

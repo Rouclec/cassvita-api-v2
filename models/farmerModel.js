@@ -47,7 +47,7 @@ const farmerSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    paymentMethod: String,
+    preferedPaymentMethod: String,
     monthCreated: {
       type: Date,
       default: new Date().getMonth(),

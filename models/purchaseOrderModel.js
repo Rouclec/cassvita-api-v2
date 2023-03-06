@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4} = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const purchaseOrderSchema = new mongoose.Schema(
@@ -15,8 +15,8 @@ const purchaseOrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "inactive"],
-      default: "active",
+      enum: ["open", "closed", "draft"],
+      default: "closed",
     },
     startDate: Date,
     endDate: Date,
@@ -51,10 +51,10 @@ purchaseOrderSchema.virtual("months").get(function () {
   );
 });
 purchaseOrderSchema.pre("save", async function (next) {
-  const activePOs = await PurchaseOrder.find({ status: "active" });
+  const activePOs = await PurchaseOrder.find({ status: "open" });
   if (activePOs) {
     activePOs.forEach(async (po) => {
-      await PurchaseOrder.findByIdAndUpdate(po._id, { status: "inactive" });
+      await PurchaseOrder.findByIdAndUpdate(po._id, { status: "closed" });
     });
   }
   this.id = `PO-${uuidv4().slice(0, 3)}`;

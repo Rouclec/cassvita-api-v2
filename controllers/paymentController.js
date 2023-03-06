@@ -8,7 +8,6 @@ const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
-const Purchase = require("../models/purchaseModel");
 const Procurement = require("../models/procumentModel");
 
 const multerStorage = multer.memoryStorage();
@@ -106,24 +105,24 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
   if (status === "Paid") {
     const farmerFound = await Farmer.findById(paymentFound.farmer._id);
     if (!farmerFound) {
-      return res.status(500).json({
-        status: "Server error",
-        message: "Something went wrong",
+      return res.status(404).json({
+        status: "Not found",
+        message: `Farmer ${farmerFound.name} doesn't exist`,
       });
     }
 
     await Farmer.findByIdAndUpdate(farmerFound._id, {
       totalPay: farmerFound.totalPay + paymentFound.amount,
-      totalBags: farmerFound.totalBags + paymentFound.totalBags,
-      totalWeight: farmerFound.totalWeight + paymentFound.totalWeight,
+      totalBags: farmerFound.totalBags + paymentFound.bags,
+      totalWeight: farmerFound.totalWeight + paymentFound.weight,
     });
     const purchaseOrderFound = await PurchaseOrder.findById(
-      paymentFound.purchaseOrderId
+      paymentFound.purchaseOrder
     );
     if (!purchaseOrderFound) {
-      return res.status(500).json({
-        status: "Server error",
-        message: "Something went wrong",
+      return res.status(404).json({
+        status: "Not found",
+        message: `Purchase Order ${purchaseOrderFound.id} not found`,
       });
     }
 
@@ -131,16 +130,6 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
       totalPayments: purchaseOrderFound.totalPayments + 1,
       purchaseOrderId: null,
     });
-
-    const purchaseFound = await Purchase.findById(paymentFound.purchase);
-    if (!purchaseFound) {
-      return res.status(500).json({
-        status: "Server error",
-        message: "Something went wrong",
-      });
-    }
-
-    await Purchase.findByIdAndUpdate(purchaseFound.id, { state: "Paid" });
   }
 
   const payment = await Payment.findByIdAndUpdate(paymentFound._id, {

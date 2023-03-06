@@ -82,7 +82,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     farmSize,
     dateOfBirth,
     community,
-    paymentMethod,
+    preferedPaymentMethod,
   } = req.body;
 
   let profilePic;
@@ -109,7 +109,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     gender,
     farmSize,
     phoneNumber,
-    paymentMethod,
+    preferedPaymentMethod,
     profilePic,
     dateOfBirth: new Date(dateOfBirth),
     community: communityId._id,
@@ -135,10 +135,8 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     farmSize,
     dateOfBirth,
     community,
-    paymentMethod,
+    preferedpreferedPaymentMethod,
   } = req.body || null;
-
-  console.log("edit request body: ", req.body);
 
   let profilePic = undefined;
 
@@ -155,7 +153,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     dateOfBirth,
     profilePic,
-    paymentMethod,
+    preferedpreferedPaymentMethod,
     community: communityId._id,
   };
   const newFarmer = await Farmer.findByIdAndUpdate(req.params.id, farmer);

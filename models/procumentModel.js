@@ -3,49 +3,58 @@ const uniqueValidator = require("mongoose-unique-validator");
 const PurchaseOrder = require("./purchaseOrderModel");
 const { v4: uuidv4 } = require("uuid");
 
-const procurementSchema = new mongoose.Schema({
-  id: String,
-  purchaseOrder: String,
-  community: String,
-  driver: String,
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  date: Date,
-  farmLocation: {
-    type: String,
-  },
-  pricePerKilo: {
-    type: Number,
-  },
-  status: {
-    type: String,
-    enum: ["open", "closed"],
-    default: "open",
-  },
-  purchases: [
-    {
+const procurementSchema = new mongoose.Schema(
+  {
+    id: String,
+    purchaseOrder: {
       type: mongoose.Schema.ObjectId,
-      ref: "Purchase",
+      ref: "PurchaseOrder",
     },
-  ],
-  totalWeight: {
-    type: Number,
-    default: 0,
+    community: String,
+    driver: String,
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+    },
+    date: Date,
+    farmLocation: {
+      type: String,
+    },
+    pricePerKilo: {
+      type: Number,
+    },
+    status: {
+      type: String,
+      enum: ["open", "closed", "expired"],
+      default: "open",
+    },
+    totalWeight: {
+      type: Number,
+      default: 0,
+    },
+    totalAmount: {
+      type: Number,
+      default: 0,
+    },
+    totalBags: {
+      type: Number,
+      default: 0,
+    },
+    createdBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
   },
-  totalAmount: {
-    type: Number,
-    default: 0,
-  },
-  totalBags: {
-    type: Number,
-    default: 0,
-  },
-  createdBy: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+procurementSchema.virtual("payments", {
+  ref: "Payment",
+  foreignField: "procurement",
+  localField: "_id",
 });
 
 procurementSchema.plugin(uniqueValidator, {
@@ -67,8 +76,8 @@ procurementSchema.statics.calculate = async function (purchaseOrderId) {
     },
   ]);
   if (stats.length > 0) {
-    const poFound = await PurchaseOrder.findOne({ id: purchaseOrderId });
-    await PurchaseOrder.findByIdAndUpdate(poFound._id, {
+    const poFound = await PurchaseOrder.findById(purchaseOrderId);
+    await PurchaseOrder.findByIdAndUpdate(purchaseOrderId, {
       totalProcurements: stats[0].totalProcurements,
     });
   }
@@ -83,20 +92,19 @@ procurementSchema.post("save", function () {
   this.constructor.calculate(this.purchaseOrder);
 });
 
-procurementSchema.post(/^findOne/, async function (doc) {
-  console.log("this document: ", this);
-  if (doc.status === "open") {
-    let status = "open";
-    let completed = doc.purchases.every(
-      (purchase) => purchase.state === "Paid"
-    );
+// procurementSchema.post(/^findOne/, async function (doc) {
+//   if (doc.status === "open") {
+//     let status = "open";
+//     let completed = doc.purchases.every(
+//       (purchase) => purchase.state === "Paid"
+//     );
 
-    console.log("completed: ", completed);
-    // if (completed)
-    doc.status = "closed";
-    this.update(doc);
-  }
-});
+//     console.log("completed: ", completed);
+//     // if (completed)
+//     doc.status = "closed";
+//     this.update(doc);
+//   }
+// });
 
 procurementSchema.pre(/^find/, function (next) {
   this.populate({
@@ -104,13 +112,11 @@ procurementSchema.pre(/^find/, function (next) {
     select: "name",
   })
     .populate({
-      path: "purchases",
-    })
-    .populate({
       path: "community",
-    });
+    })
+    .populate("payments");
   next();
 });
 
-const Procurement = mongoose.model("Procument", procurementSchema);
+const Procurement = mongoose.model("Procurement", procurementSchema);
 module.exports = Procurement;

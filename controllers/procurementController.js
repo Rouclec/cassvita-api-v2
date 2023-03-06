@@ -1,5 +1,7 @@
 const Community = require("../models/communityModel");
 const Driver = require("../models/driverModel");
+const Farmer = require("../models/farmerModel");
+const Payment = require("../models/paymentModel");
 const Procurement = require("../models/procumentModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
@@ -14,7 +16,7 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     driver,
     farmLocation,
     pricePerKilo,
-    purchases,
+    payments,
     date,
     totalWeight,
     totalBags,
@@ -56,18 +58,49 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
 
   const procurement = {
     driver,
-    purchaseOrder,
+    purchaseOrder: purchaseOrderId._id,
     totalWeight,
     totalAmount: totalWeight * pricePerKilo * 1,
     farmLocation,
     pricePerKilo,
     community,
-    purchases,
     date,
     totalBags,
     createdBy: req.user._id,
   };
   const newProcurement = await Procurement.create(procurement);
+
+  await payments.forEach(async (payment) => {
+    const farmerId = await Farmer.findOne({ name: payment.farmer });
+    if (!farmerId) {
+      return next(
+        res.status(404).json({
+          status: "Not found",
+          message: `Farmer ${payment.farmer} not found`,
+        })
+      );
+    }
+    let newPayment = {
+      farmer: farmerId._id,
+      createdBy: req.user._id,
+      amount: payment.amount,
+      weight: payment.weight,
+      bags: payment.bags,
+      paymentMethod: payment.paymentMethod,
+      purchaseOrder: purchaseOrderId._id,
+      procurement: newProcurement._id,
+    };
+    const paymentCreated = await Payment.create(newPayment);
+
+    if (!paymentCreated) {
+      return next(
+        res.status(500).json({
+          status: "Server Error",
+          message: `Error creating payment for farmer ${payment.farmer}`,
+        })
+      );
+    }
+  });
   return next(
     res.status(201).json({
       status: "OK",
