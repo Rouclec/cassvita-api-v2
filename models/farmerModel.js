@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const uniqueValidator = require("mongoose-unique-validator");
+const Community = require("./communityModel");
 
 const farmerSchema = new mongoose.Schema(
   {
@@ -72,6 +73,22 @@ farmerSchema.pre(/^find/, async function (next) {
     path: "community",
   });
   next();
+});
+
+farmerSchema.statics.addNumberOfFarmers = async (community) => {
+  const communityFound = await Community.findById(community);
+  if (!communityFound) {
+    console.log("Error: community ", community, " not found!");
+  }
+  await Community.findByIdAndUpdate(community, {
+    numberOfFarmers: communityFound.numberOfFarmers + 1,
+  });
+};
+
+farmerSchema.post("save", async function (doc) {
+  if(doc.community){
+    await doc.constructor.addNumberOfFarmers(doc.community);
+  }
 });
 
 const Farmer = mongoose.model("Farmer", farmerSchema);

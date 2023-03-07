@@ -26,6 +26,10 @@ const communitySchema = new mongoose.Schema({
       validate: [validator.isMobilePhone, "Please enter a valid phone number"],
     },
   },
+  numberOfFarmers: {
+    type: Number, 
+    default: 0
+  },
   unitPrice: Number,
   createdBy: {
     type: mongoose.Schema.ObjectId,

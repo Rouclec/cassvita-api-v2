@@ -86,6 +86,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
   } = req.body;
 
   let profilePic;
+  let community_id = undefined;
 
   if (req.profilePic) {
     profilePic = req.profilePic;
@@ -95,13 +96,8 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
 
   const communityId = await Community.findOne({ name: community });
 
-  if (!communityId) {
-    return next(
-      res.status(404).json({
-        status: "Not Found",
-        message: `Community ${community} not found`,
-      })
-    );
+  if (communityId) {
+    community_id = communityId._id;
   }
 
   const farmer = {
@@ -112,7 +108,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     preferedPaymentMethod,
     profilePic,
     dateOfBirth: new Date(dateOfBirth),
-    community: communityId._id,
+    community: community_id,
     createdBy: req.user._id,
   };
 
@@ -139,12 +135,16 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
   } = req.body || null;
 
   let profilePic = undefined;
+  let community_id = undefined;
 
   if (req.profilePic) {
     profilePic = req.profilePic;
   }
 
   const communityId = await Community.find({ name: community });
+  if (communityId) {
+    community_id = communityId._id;
+  }
 
   const farmer = {
     name,
@@ -154,7 +154,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     dateOfBirth,
     profilePic,
     preferedpreferedPaymentMethod,
-    community: communityId._id,
+    community: community_id,
   };
   const newFarmer = await Farmer.findByIdAndUpdate(req.params.id, farmer);
 
