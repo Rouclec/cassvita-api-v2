@@ -131,7 +131,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     farmSize,
     dateOfBirth,
     community,
-    preferedpreferedPaymentMethod,
+    preferedPaymentMethod,
   } = req.body || null;
 
   let profilePic = undefined;
@@ -153,7 +153,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     dateOfBirth,
     profilePic,
-    preferedpreferedPaymentMethod,
+    preferedPaymentMethod,
     community: community_id,
   };
   const newFarmer = await Farmer.findByIdAndUpdate(req.params.id, farmer);
