@@ -166,6 +166,30 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
   );
 });
 
+exports.removeFromCommunity = catchAsync(async (req, res, next) => {
+  const farmerFound = await Farmer.findById(req.params.id);
+
+  if (!farmerFound) {
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: `Farmer with id ${req.params.id} not found`,
+      })
+    );
+  }
+
+  const updatedFarmer = await Farmer.findByIdAndUpdate(req.params.id, {
+    community: undefined,
+  });
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: updatedFarmer,
+    })
+  );
+});
+
 exports.stats = catchAsync(async (req, res, next) => {
   let totalFarmers = 0,
     fromCommunity = 0,

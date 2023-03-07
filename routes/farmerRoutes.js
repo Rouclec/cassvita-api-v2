@@ -9,6 +9,7 @@ const {
   uploadProfilePic,
   resizePhoto,
   getAllFarmersFromCommunity,
+  removeFromCommunity,
 } = require("../controllers/farmerController");
 const router = express.Router();
 
@@ -22,6 +23,9 @@ router
     resizePhoto,
     createFarmer
   );
+router
+  .route("/:id/remove-from-community")
+  .get(restrictTo("admin", "ceo", "manager"), removeFromCommunity);
 router
   .route("/community/:communityId")
   .get(restrictTo("admin", "ceo", "manager"), getAllFarmersFromCommunity);
