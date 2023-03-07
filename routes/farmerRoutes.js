@@ -8,6 +8,7 @@ const {
   stats,
   uploadProfilePic,
   resizePhoto,
+  getAllFarmersFromCommunity,
 } = require("../controllers/farmerController");
 const router = express.Router();
 
@@ -21,6 +22,9 @@ router
     resizePhoto,
     createFarmer
   );
+router
+  .route("/community/:communityId")
+  .get(restrictTo("admin", "ceo", "manager"), getAllFarmersFromCommunity);
 router.get("/stats", restrictTo("admin", "ceo", "manager"), stats);
 router
   .route("/:id")

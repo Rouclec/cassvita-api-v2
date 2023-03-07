@@ -252,3 +252,18 @@ exports.stats = catchAsync(async (req, res, next) => {
     data: response,
   });
 });
+
+exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
+  let farmers = [];
+
+  const community = await Community.findById(req.params.communityId);
+  farmers = await Farmer.find({ community: community });
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      results: farmers?.length,
+      data: farmers,
+    })
+  );
+});
