@@ -141,7 +141,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     profilePic = req.profilePic;
   }
 
-  const communityId = await Community.find({ name: community });
+  const communityId = await Community.findOne({ name: community });
   if (communityId) {
     community_id = communityId._id;
   }
