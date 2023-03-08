@@ -16,7 +16,7 @@ const purchaseOrderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["open", "closed", "draft"],
-      default: "closed",
+      default: "open",
     },
     startDate: Date,
     endDate: Date,
