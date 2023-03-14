@@ -15,7 +15,7 @@ exports.deleteOne = (Model) =>
     }
     await Model.findByIdAndDelete(req.params.id);
     res.status(204).json({
-      status: "Deleted",
+      status: "OK",
       message: "Document deleted successfully!",
     });
   });
@@ -29,7 +29,7 @@ exports.updateOne = (Model, params) =>
       runValidators: true,
     });
     res.status(200).json({
-      status: "Updated",
+      status: "OK",
       data: updatedDoc,
     });
   });
