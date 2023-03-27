@@ -80,9 +80,16 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
     const docs = await features.query;
+    const count = await Model.count();
+    let page = "1 of 1";
+    if (req.query.page && req.query.limit) {
+      const pages = Math.ceil(count / req.query.limit);
+      page = `${req.query.page} of ${pages}`;
+    }
     res.status(200).json({
       status: "OK",
       results: docs.length,
+      page: page,
       data: docs,
     });
   });
