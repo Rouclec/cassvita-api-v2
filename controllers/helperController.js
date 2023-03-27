@@ -74,7 +74,12 @@ exports.getOne = (Model, populateOptions, selectOptions) =>
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const docs = await Model.find();
+    const features = new APIFeatures(Model.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const docs = await features.query;
     res.status(200).json({
       status: "OK",
       results: docs.length,
