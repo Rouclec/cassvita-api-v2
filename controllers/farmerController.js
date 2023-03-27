@@ -178,6 +178,21 @@ exports.removeFromCommunity = catchAsync(async (req, res, next) => {
     );
   }
 
+  const communityFound = await Community.findById(farmerFound.community._id);
+
+  if (!communityFound) {
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: `Community not found!`,
+      })
+    );
+  }
+
+  await Community.findByIdAndUpdate(communityFound._id, {
+    numberOfFarmers: communityFound.numberOfFarmers - 1,
+  });
+
   const updatedFarmer = await Farmer.findByIdAndUpdate(req.params.id, {
     community: undefined,
   });

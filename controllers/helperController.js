@@ -15,7 +15,7 @@ exports.deleteOne = (Model) =>
     }
     await Model.findByIdAndDelete(req.params.id);
     res.status(204).json({
-      status: "Deleted",
+      status: "OK",
       message: "Document deleted successfully!",
     });
   });
@@ -29,7 +29,7 @@ exports.updateOne = (Model, params) =>
       runValidators: true,
     });
     res.status(200).json({
-      status: "Updated",
+      status: "OK",
       data: updatedDoc,
     });
   });
@@ -74,7 +74,12 @@ exports.getOne = (Model, populateOptions, selectOptions) =>
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const docs = await Model.find();
+    const features = new APIFeatures(Model.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const docs = await features.query;
     res.status(200).json({
       status: "OK",
       results: docs.length,
