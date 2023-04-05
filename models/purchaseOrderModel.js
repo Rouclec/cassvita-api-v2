@@ -9,14 +9,15 @@ const purchaseOrderSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Please enter the size for this purchase order"],
     },
-    amount: {
-      type: Number,
-      required: [true, "Please enter the size for this purchase order"],
-    },
+    amount: Number,
     status: {
       type: String,
       enum: ["open", "closed", "draft"],
       default: "open",
+    },
+    unitPrice: {
+      type: Number, 
+      required: [true, "Please provide a unit price for this P.O."]
     },
     startDate: Date,
     endDate: Date,
@@ -57,7 +58,9 @@ purchaseOrderSchema.pre("save", async function (next) {
       await PurchaseOrder.findByIdAndUpdate(po._id, { status: "closed" });
     });
   }
-  this.id = `PO-${uuidv4().slice(0, 3)}`;
+  const date = new Date().toDateString().split(' ')
+
+  this.id = `PO-${date[1]}-${date[3].slice(-2)}`;
   next();
 });
 purchaseOrderSchema.pre(/^find/, function (next) {

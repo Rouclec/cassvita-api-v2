@@ -36,7 +36,6 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
       );
     }
     farmLocation = communityId.location;
-    pricePerKilo = communityId.unitPrice;
   }
 
   if (!driverId) {
@@ -56,15 +55,20 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     );
   }
 
+  const id = `P-${new Date().toDateString().split(" ")[2]}-${
+    purchaseOrder.split("-")[1]
+  }-${purchaseOrder.split("-")[2]}`;
+
   const procurement = {
     driver,
     purchaseOrder: purchaseOrderId._id,
     totalWeight,
-    totalAmount: totalWeight * pricePerKilo * 1,
+    totalAmount: totalWeight * purchaseOrderId.unitPrice * 1,
     farmLocation,
-    pricePerKilo,
+    pricePerKilo: purchaseOrderId.unitPrice * 1,
     community,
     date,
+    id,
     totalBags,
     createdBy: req.user._id,
   };
@@ -169,6 +173,10 @@ exports.updateProcurement = catchAsync(async (req, res, next) => {
     );
   }
 
+  const id = `P-${new Date().toDateString().split(" ")[2]}-${
+    purchaseOrder.split("-")[1]
+  }-${purchaseOrder.split("-")[2]}`;
+
   const procurement = {
     driver: driverId._id,
     purchaseOrder: purchaseOrderId._id,
@@ -177,6 +185,7 @@ exports.updateProcurement = catchAsync(async (req, res, next) => {
     farmLocation,
     pricePerKilo,
     purchases,
+    id,
     date,
     totalBags,
   };

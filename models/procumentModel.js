@@ -76,19 +76,14 @@ procurementSchema.statics.calculate = async function (purchaseOrderId) {
     },
   ]);
   if (stats.length > 0) {
-    const poFound = await PurchaseOrder.findById(purchaseOrderId);
     await PurchaseOrder.findByIdAndUpdate(purchaseOrderId, {
       totalProcurements: stats[0].totalProcurements,
     });
   }
 };
 
-procurementSchema.pre("save", async function (next) {
-  this.id = `P-${uuidv4().slice(0, 3)}`;
-  next();
-});
 
-procurementSchema.post("save", function () {
+procurementSchema.post("save", async function () {
   this.constructor.calculate(this.purchaseOrder);
 });
 
