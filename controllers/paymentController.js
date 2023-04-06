@@ -9,6 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
 const Procurement = require("../models/procumentModel");
+const { default: mongoose } = require("mongoose");
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -172,8 +173,14 @@ exports.stats = catchAsync(async (req, res, next) => {
       },
     },
   ]);
+  const farmers = await Farmer.find();
+
   purchases.forEach(async (purchase) => {
+    // console.log('farmer name: ', purchase._id.toString());
     purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
+    purchase.farmer = farmers.find(
+      (farmer) => farmer.id === purchase._id.toString()
+    )?.name;
   });
   res.status(200).json({
     status: "OK",
@@ -191,13 +198,15 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
     lastDay = new Date(req.params.endDate);
   }
 
+  const farmerObjectId = mongoose.Types.ObjectId(farmerId);
+
   let purchases = await Payment.aggregate([
     {
       $match: {
         $and: [
           { createdAt: { $gt: firstDay } },
           { createdAt: { $lte: lastDay } },
-          { farmer: farmerId },
+          { farmer: { $eq: farmerObjectId } },
         ],
       },
     },
@@ -210,8 +219,10 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
       },
     },
   ]);
+  const farmer = await Farmer.findById(farmerId);
   purchases.forEach(async (purchase) => {
     purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
+    purchase.farmer = farmer?.name;
   });
   res.status(200).json({
     status: "OK",

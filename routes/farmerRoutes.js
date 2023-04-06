@@ -18,8 +18,8 @@ const {
 const router = express.Router();
 
 router.use(protect);
+router.get("/reports/individual/:farmerId/:startDate?/:endDate?", farmerStats);
 router.get("/reports/:startDate?/:endDate?", allFarmerStats);
-router.get("/reports/:farmerId/:startDate?/:endDate?", farmerStats);
 router
   .route("/")
   .get(restrictTo("admin", "ceo", "manager"), getAllFarmers)

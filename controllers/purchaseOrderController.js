@@ -76,6 +76,9 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   let bdc;
   const { quantity, amount, startDate, endDate, unitPrice } = req.body;
 
+
+  console.log("req.body: ", req.body);
+
   if (req.bdc) {
     bdc = req.bdc;
   } else {
@@ -113,7 +116,7 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
 
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
     quantity: quantity * 1,
-    amount: (quantity * 1) * (unitPrice * 1),
+    amount: quantity * 1 * (unitPrice * 1),
     unitPrice: unitPrice * 1,
     startDate,
     endDate,

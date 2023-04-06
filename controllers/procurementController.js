@@ -50,7 +50,7 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     return next(
       res.status(404).json({
         status: "Not found",
-        message: `PurchaseOrder ${PurchaseOrder} not found`,
+        message: `Purchase Order ${purchaseOrder} not found`,
       })
     );
   }
@@ -168,7 +168,7 @@ exports.updateProcurement = catchAsync(async (req, res, next) => {
     return next(
       res.status(404).json({
         status: "Not found",
-        message: `PurchaseOrder ${PurchaseOrder} not found`,
+        message: `Purchase Order ${purchaseOrder} not found`,
       })
     );
   }
