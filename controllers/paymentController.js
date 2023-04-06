@@ -176,3 +176,36 @@ exports.stats = catchAsync(async (req, res, next) => {
     data: purchases,
   });
 });
+
+exports.farmerStats = catchAsync(async (req, res, next) => {
+  const { startMonth, startYear, endMonth, endYear, farmerId } = req.params;
+  const firstDay = new Date(startYear, startMonth - 1, 1);
+  const lastDay = new Date(endYear, endMonth, 1);
+
+  let purchases = await Payment.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+          { farmer: farmerId}
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$month",
+        totalAmount: { $sum: "$amount" },
+        totalKg: { $sum: "$weight" },
+        totalBags: { $sum: "$bags" },
+      },
+    },
+  ]);
+  purchases.forEach(async (purchase) => {
+    purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
+  });
+  res.status(200).json({
+    status: "OK",
+    data: purchases,
+  });
+});

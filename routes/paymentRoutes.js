@@ -14,8 +14,6 @@ router.use(protect);
 
 router.get("/", getAllPayments);
 
-router.get("/stats/:startMonth/:startYear/:endMonth/:endYear", stats);
-
 router.get("/:id", getPayment);
 router.patch(
   "/:id/:status",

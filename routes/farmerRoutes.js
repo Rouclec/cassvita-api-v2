@@ -11,6 +11,7 @@ const {
   getAllFarmersFromCommunity,
   removeFromCommunity,
 } = require("../controllers/farmerController");
+const { stats, farmerStats } = require("../controllers/paymentController");
 const router = express.Router();
 
 router.use(protect);
@@ -39,5 +40,11 @@ router
     resizePhoto,
     updateFarmer
   );
+
+router.get("/stats/:startMonth/:startYear/:endMonth/:endYear", stats);
+router.get(
+  "/stats/:farmerId/:startMonth/:startYear/:endMonth/:endYear",
+  farmerStats
+);
 
 module.exports = router;
