@@ -76,8 +76,20 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   let bdc;
   const { quantity, amount, startDate, endDate, unitPrice } = req.body;
 
+  const date = new Date().toDateString().split(" ");
 
-  console.log("req.body: ", req.body);
+  const id = `PO-${date[1]}-${date[3].slice(-2)}`;
+
+  const existingPo = await PurchaseOrder.find({ id: id});
+
+  if (existingPo.length > 0) {
+    return next(
+      res.status(500).json({
+        status: "Bad request",
+        message: "An open purchase order already exists for this month",
+      })
+    );
+  }
 
   if (req.bdc) {
     bdc = req.bdc;
@@ -86,8 +98,9 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   }
 
   const purchaseOrder = await PurchaseOrder.create({
+    id,
     quantity: quantity * 1,
-    amount: (quantity * 1) * (unitPrice * 1),
+    amount: quantity * 1 * (unitPrice * 1),
     unitPrice: unitPrice * 1,
     startDate,
     endDate,

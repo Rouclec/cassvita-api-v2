@@ -58,9 +58,6 @@ purchaseOrderSchema.pre("save", async function (next) {
       await PurchaseOrder.findByIdAndUpdate(po._id, { status: "closed" });
     });
   }
-  const date = new Date().toDateString().split(' ')
-
-  this.id = `PO-${date[1]}-${date[3].slice(-2)}`;
   next();
 });
 purchaseOrderSchema.pre(/^find/, function (next) {
