@@ -146,9 +146,13 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
 });
 
 exports.stats = catchAsync(async (req, res, next) => {
-  const { startMonth, startYear, endMonth, endYear } = req.params;
-  const firstDay = new Date(startYear, startMonth - 1, 1);
-  const lastDay = new Date(endYear, endMonth, 1);
+  let firstDay = new Date(2022, 0, 1);
+  let lastDay = new Date(3000, 11, 31);
+
+  if (req.params.startDate && req.params.endDate) {
+    firstDay = new Date(req.params.startDate);
+    lastDay = new Date(req.params.endDate);
+  }
 
   let purchases = await Payment.aggregate([
     {
@@ -178,9 +182,14 @@ exports.stats = catchAsync(async (req, res, next) => {
 });
 
 exports.farmerStats = catchAsync(async (req, res, next) => {
-  const { startMonth, startYear, endMonth, endYear, farmerId } = req.params;
-  const firstDay = new Date(startYear, startMonth - 1, 1);
-  const lastDay = new Date(endYear, endMonth, 1);
+  const { farmerId } = req.params;
+  let firstDay = new Date(2022, 0, 1);
+  let lastDay = new Date(3000, 11, 31);
+
+  if (req.params.startDate && req.params.endDate) {
+    firstDay = new Date(req.params.startDate);
+    lastDay = new Date(req.params.endDate);
+  }
 
   let purchases = await Payment.aggregate([
     {
@@ -188,7 +197,7 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
         $and: [
           { createdAt: { $gt: firstDay } },
           { createdAt: { $lte: lastDay } },
-          { farmer: farmerId}
+          { farmer: farmerId },
         ],
       },
     },

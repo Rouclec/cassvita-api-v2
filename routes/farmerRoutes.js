@@ -11,10 +11,15 @@ const {
   getAllFarmersFromCommunity,
   removeFromCommunity,
 } = require("../controllers/farmerController");
-const { stats, farmerStats } = require("../controllers/paymentController");
+const {
+  stats: allFarmerStats,
+  farmerStats,
+} = require("../controllers/paymentController");
 const router = express.Router();
 
 router.use(protect);
+router.get("/reports/:startDate?/:endDate?", allFarmerStats);
+router.get("/reports/:farmerId/:startDate?/:endDate?", farmerStats);
 router
   .route("/")
   .get(restrictTo("admin", "ceo", "manager"), getAllFarmers)
@@ -40,11 +45,5 @@ router
     resizePhoto,
     updateFarmer
   );
-
-router.get("/stats/:startMonth/:startYear/:endMonth/:endYear", stats);
-router.get(
-  "/stats/:farmerId/:startMonth/:startYear/:endMonth/:endYear",
-  farmerStats
-);
 
 module.exports = router;
