@@ -44,6 +44,10 @@ const paymentSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    month: {
+      type: String,
+      default: `${new Date().getMonth()}:${new Date().getFullYear()}`,
+    },
     updatedBy: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
