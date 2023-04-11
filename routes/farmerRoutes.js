@@ -10,6 +10,9 @@ const {
   resizePhoto,
   getAllFarmersFromCommunity,
   removeFromCommunity,
+  // uploadFarmersFromExcel,
+  uploadXlFile,
+  processXlFile,
 } = require("../controllers/farmerController");
 const {
   stats: allFarmerStats,
@@ -20,6 +23,12 @@ const router = express.Router();
 router.use(protect);
 router.get("/reports/individual/:farmerId/:startDate?/:endDate?", farmerStats);
 router.get("/reports/:startDate?/:endDate?", allFarmerStats);
+router.post(
+  "/upload-from-file",
+  uploadXlFile,
+  processXlFile,
+  // uploadFarmersFromExcel
+);
 router
   .route("/")
   .get(restrictTo("admin", "ceo", "manager"), getAllFarmers)

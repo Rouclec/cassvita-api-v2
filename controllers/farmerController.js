@@ -7,6 +7,39 @@ const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
+const xlsx = require("xlsx");
+
+const formatNumber = (number) => {
+  let phone;
+  if (
+    (number.startsWith("00") && number.indexOf("6") === 5) ||
+    number.startsWith("+237") ||
+    number.startsWith("237") ||
+    number.startsWith("6")
+  ) {
+    phone = "+2376" + number.replaceAll(" ", "").slice(number.indexOf("6") + 1);
+  } else if (number.startsWith("+2")) {
+    phone = number.replaceAll(" ", "");
+  } else if (number.startsWith("2") && number.length === 12) {
+    phone = "+" + number.replaceAll(" ", "");
+  } else {
+    phone = "+237" + number.replaceAll(" ", "");
+  }
+  return phone;
+};
+
+const formatWord = (str) => {
+  return str.toLowerCase().charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+const formatName = (str) => {
+  let names = str.split(" ");
+  names.forEach((name, i) => {
+    names[i] =
+      name.toLowerCase().charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  });
+  return names.join(" ");
+};
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -69,6 +102,98 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
   req.profilePic = res.Location;
   next();
 });
+
+const fileStorage = multer.diskStorage({
+  destination: __dirname.replace("controllers", "public/files/farmer-data"),
+  filename: function (req, file, cb) {
+    //req.body is empty... here is where req.body.new_file_name doesn't exists
+    cb(null, file.originalname);
+  },
+});
+
+exports.uploadXlFile = multer({
+  storage: fileStorage,
+}).single("farmersData");
+
+exports.processXlFile = catchAsync(async (req, res, next) => {
+  const workbook = xlsx.readFile(
+    `${__dirname.replace(
+      "controllers",
+      "public/files/farmer-data"
+    )}/Cassvita Farmer Profiling (Responses).xlsx`,
+    { cellDates: true }
+  );
+  const data = xlsx.utils.sheet_to_json(workbook.Sheets["Form Responses 1"]);
+  // console.log("data: ", data);
+  let farmersCreated = [];
+  if (data.length > 0) {
+    data.forEach(async (farmerData) => {
+      // console.log('farmerData: ',farmerData.phoneNumber)
+      let name = farmerData?.name || "";
+      let gender = farmerData?.gender || "";
+      let community = farmerData?.community || "";
+      let farmSize = farmerData?.farmSize || 0;
+      let averageInvestment = farmerData?.averageInvestment || 0;
+      let numberOfFarms = farmerData?.numberOfFarms || 1;
+      let profilePic = farmerData?.profilePic || "";
+      let preferedPaymentMethod = farmerData?.preferedPaymentMethod || "";
+      let phoneNumber = farmerData.phoneNumber
+        ? formatNumber(farmerData?.phoneNumber.toString().split("/")[0])
+        : undefined;
+      let dateOfBirth = farmerData.dateOfBirth
+        ? new Date(farmerData?.dateOfBirth)
+        : new Date("1994/01/01");
+
+      let community_id = undefined;
+      let communityId = undefined;
+
+      if (community) {
+        communityId = await Community.findOne({
+          name: formatWord(community),
+        });
+      }
+
+      if (communityId) {
+        community_id = communityId._id;
+      }
+
+      if (name.length > 0) {
+        const farmer = {
+          name: formatName(name),
+          gender: formatWord(gender) === "Male" ? "M" : "F",
+          farmSize,
+          phoneNumber,
+          preferedPaymentMethod,
+          numberOfFarms,
+          averageInvestment,
+          profilePic,
+          dateOfBirth: new Date(dateOfBirth),
+          community: community_id,
+          createdBy: req.user._id,
+        };
+
+        const newFarmer = await Farmer.create(farmer);
+        farmersCreated.push(newFarmer);
+      }
+    });
+  }
+  return next(
+    res.status(201).json({
+      status: "OK",
+      results: farmersCreated.length,
+      data: farmersCreated,
+    })
+  );
+});
+
+// exports.uploadFarmersFromExcel = catchAsync(async (req, res, next) => {
+//   return next(
+//     res.status(200).json({
+//       status: "OK",
+//       message: "File uploaded successfully!",
+//     })
+//   );
+// });
 
 exports.getAllFarmers = getAll(Farmer);
 exports.getFarmer = getOne(Farmer, "community");

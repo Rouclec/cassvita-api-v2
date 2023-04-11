@@ -4,7 +4,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
 
-const { getAll, getOne, createOne, updateOne } = require("./helperController");
+const { getAll, getOne} = require("./helperController");
 const catchAsync = require("../utils/catchAsync");
 
 const multerStorage = multer.memoryStorage();

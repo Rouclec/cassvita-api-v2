@@ -11,7 +11,7 @@ const farmerSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      validate: [validator.isMobilePhone, "Please enter a valid phone number"],
+      // validate: [validator.isMobilePhone, "Please enter a valid phone number"],
     },
     dateOfBirth: Date,
     gender: {
@@ -19,6 +19,13 @@ const farmerSchema = new mongoose.Schema(
       enum: ["M", "F"],
     },
     farmSize: Number,
+    numberOfFarms: {
+      type: Number, 
+      default: 1,
+    },
+    averageInvestment: {
+      type: String
+    },
     community: {
       type: mongoose.Schema.ObjectId,
       ref: "Community",
@@ -86,7 +93,7 @@ farmerSchema.statics.addNumberOfFarmers = async (community) => {
 };
 
 farmerSchema.post("save", async function (doc) {
-  if(doc.community){
+  if (doc.community) {
     await doc.constructor.addNumberOfFarmers(doc.community);
   }
 });
