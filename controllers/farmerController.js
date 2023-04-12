@@ -29,16 +29,22 @@ const formatNumber = (number) => {
 };
 
 const formatWord = (str) => {
-  return str.toLowerCase().charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  if (str && str.length > 0)
+    return (
+      str.toLowerCase().charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    );
 };
 
 const formatName = (str) => {
-  let names = str.split(" ");
-  names.forEach((name, i) => {
-    names[i] =
-      name.toLowerCase().charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  });
-  return names.join(" ");
+  if (str && str.length > 0) {
+    let names = str.split(" ");
+    names.forEach((name, i) => {
+      names[i] =
+        name.toLowerCase().charAt(0).toUpperCase() +
+        name.slice(1).toLowerCase();
+    });
+    return names.join(" ");
+  }
 };
 
 const multerStorage = multer.memoryStorage();
@@ -130,13 +136,13 @@ exports.processXlFile = catchAsync(async (req, res, next) => {
     data.forEach(async (farmerData) => {
       // console.log('farmerData: ',farmerData.phoneNumber)
       let name = farmerData?.name || "";
-      let gender = farmerData?.gender || "";
-      let community = farmerData?.community || "";
-      let farmSize = farmerData?.farmSize || 0;
+      let gender = farmerData?.gender;
+      let community = farmerData?.community;
+      let farmSize = farmerData?.farmSize;
       let averageInvestment = farmerData?.averageInvestment || 0;
       let numberOfFarms = farmerData?.numberOfFarms || 1;
-      let profilePic = farmerData?.profilePic || "";
-      let preferedPaymentMethod = farmerData?.preferedPaymentMethod || "";
+      let profilePic = farmerData?.profilePic;
+      let preferedPaymentMethod = farmerData?.preferedPaymentMethod;
       let phoneNumber = farmerData.phoneNumber
         ? formatNumber(farmerData?.phoneNumber.toString().split("/")[0])
         : undefined;
