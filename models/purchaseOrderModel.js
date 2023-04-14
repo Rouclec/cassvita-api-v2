@@ -60,14 +60,22 @@ purchaseOrderSchema.pre("save", async function (next) {
   }
   next();
 });
-purchaseOrderSchema.pre(/^find/, function (next) {
+purchaseOrderSchema.pre(/^find/, async function (next) {
   this.populate({
     path: "createdBy",
     select: "fullName -_id",
   });
-  let today = new Date(Date.now());
-  if (this.endDate < today) this.status = "closed";
   next();
+});
+purchaseOrderSchema.post(/^find/, function (docs) {
+  const today = new Date(Date.now());
+  if (docs && docs.length) {
+    docs.forEach(async (doc) => {
+      if (doc.endDate < today && doc.status === 'open') {
+        await PurchaseOrder.findByIdAndUpdate(doc._id, { status: "closed" });
+      }
+    });
+  }
 });
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
 module.exports = PurchaseOrder;
