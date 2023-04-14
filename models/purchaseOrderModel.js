@@ -16,8 +16,8 @@ const purchaseOrderSchema = new mongoose.Schema(
       default: "open",
     },
     unitPrice: {
-      type: Number, 
-      required: [true, "Please provide a unit price for this P.O."]
+      type: Number,
+      required: [true, "Please provide a unit price for this P.O."],
     },
     startDate: Date,
     endDate: Date,
@@ -65,6 +65,8 @@ purchaseOrderSchema.pre(/^find/, function (next) {
     path: "createdBy",
     select: "fullName -_id",
   });
+  let today = new Date(Date.now());
+  if (this.endDate < today) this.status = "closed";
   next();
 });
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
