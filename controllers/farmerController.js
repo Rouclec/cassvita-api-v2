@@ -282,7 +282,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     gender,
     farmSize,
     phoneNumber,
-    dateOfBirth,
+    dateOfBirth: new Date(dateOfBirth),
     profilePic,
     preferedPaymentMethod,
     community: community_id,

@@ -13,7 +13,10 @@ const farmerSchema = new mongoose.Schema(
       type: String,
       // validate: [validator.isMobilePhone, "Please enter a valid phone number"],
     },
-    dateOfBirth: Date,
+    dateOfBirth: {
+      type: Date,
+      validate: [validator.isDate, "Invalid date, please enter a correct date"]
+    },
     gender: {
       type: String,
       enum: ["M", "F"],
