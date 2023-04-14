@@ -146,7 +146,7 @@ exports.updatePurchaseOrder = catchAsync(async (req, res, next) => {
 
 exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
   const purchaseOrder = await PurchaseOrder.findByIdAndUpdate(req.params.id, {
-    status: "close",
+    status: "closed",
   });
 
   next(
