@@ -79,12 +79,19 @@ exports.getAll = (Model) =>
       .sort("-createdAt")
       .limitFields()
       .paginate();
+
     const docs = await features.query;
-    const count = await Model.count();
+    let pageQuery = features.queryString.page;
+    let limitQuery = features.queryString.limit;
+    let newQueryString = features.queryString;
+    delete newQueryString.sort;
+    delete newQueryString.page;
+    delete newQueryString.limit;
+    const count = await Model.count(newQueryString);
     let page = "1 of 1";
-    if (req.query.page && req.query.limit) {
-      const pages = Math.ceil(count / req.query.limit);
-      page = `${req.query.page} of ${pages}`;
+    if (pageQuery && limitQuery) {
+      const pages = Math.ceil(count / limitQuery);
+      page = `${pageQuery} of ${pages}`;
     }
     res.status(200).json({
       status: "OK",
