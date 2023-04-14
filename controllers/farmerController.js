@@ -211,18 +211,26 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     gender,
     farmSize,
-    dateOfBirth,
     community,
     preferedPaymentMethod,
   } = req.body;
 
   let profilePic;
   let community_id = undefined;
+  let dateOfBirth = undefined;
 
   if (req.profilePic) {
     profilePic = req.profilePic;
   } else {
     profilePic = undefined;
+  }
+
+
+  if (req.body.dateOfBirth) {
+    let date = new Date(req.body.dateOfBirth);
+    if(date.toString() !== 'Invalid Date'){
+      dateOfBirth = date
+    }
   }
 
   const communityId = await Community.findOne({ name: community });
@@ -238,7 +246,7 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     preferedPaymentMethod,
     profilePic,
-    dateOfBirth: new Date(dateOfBirth),
+    dateOfBirth,
     community: community_id,
     createdBy: req.user._id,
   };
@@ -260,16 +268,23 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     phoneNumber,
     gender,
     farmSize,
-    dateOfBirth,
     community,
     preferedPaymentMethod,
   } = req.body || null;
 
   let profilePic = undefined;
   let community_id = undefined;
+  let dateOfBirth = undefined
 
   if (req.profilePic) {
     profilePic = req.profilePic;
+  }
+
+  if (req.body.dateOfBirth) {
+    let date = new Date(req.body.dateOfBirth);
+    if(date.toString() !== 'Invalid Date'){
+      dateOfBirth = date
+    }
   }
 
   const communityId = await Community.findOne({ name: community });
@@ -282,7 +297,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
     gender,
     farmSize,
     phoneNumber,
-    dateOfBirth: new Date(dateOfBirth),
+    dateOfBirth,
     profilePic,
     preferedPaymentMethod,
     community: community_id,
