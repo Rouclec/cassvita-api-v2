@@ -200,32 +200,28 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
 
   const farmerObjectId = mongoose.Types.ObjectId(farmerId);
 
-  let purchases = await Payment.aggregate([
-    {
-      $match: {
-        $and: [
-          { createdAt: { $gt: firstDay } },
-          { createdAt: { $lte: lastDay } },
-          { farmer: { $eq: farmerObjectId } },
-        ],
-      },
-    },
-    {
-      $group: {
-        _id: "$month",
-        totalAmount: { $sum: "$amount" },
-        totalKg: { $sum: "$weight" },
-        totalBags: { $sum: "$bags" },
-      },
-    },
-  ]);
+  let purchases = await Payment.find({
+    $and: [
+      { createdAt: { $gt: firstDay } },
+      { createdAt: { $lte: lastDay } },
+      { status: { $eq: "Paid" } },
+      { farmer: { $eq: farmerObjectId } },
+    ],
+  }).select("-farmer -procurement -createdBy -month -updatedBy -updatedOn -purchaseOrder");
   const farmer = await Farmer.findById(farmerId);
-  purchases.forEach(async (purchase) => {
-    purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
-    purchase.farmer = farmer?.name;
-  });
+
+  let data = {
+    farmer: {
+      name: farmer?.name,
+      dateOfBirth: farmer?.dateOfBirth,
+      gender: farmer?.gender,
+      community: farmer?.community?.name,
+      createdAt: farmer?.createdAt,
+    },
+    purchases: purchases,
+  };
   res.status(200).json({
     status: "OK",
-    data: purchases,
+    data,
   });
 });
