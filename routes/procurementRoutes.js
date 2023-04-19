@@ -5,11 +5,12 @@ const {
   createProcurement,
   updateProcurement,
   getProcurement,
+  stats,
 } = require("../controllers/procurementController");
 
 const router = express.Router();
 router.use(protect);
-
+router.get("/reports/:startDate?/:endDate?", stats);
 router
   .route("/")
   .get(getAllProcurements)

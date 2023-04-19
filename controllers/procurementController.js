@@ -226,3 +226,68 @@ exports.closeProcurement = catchAsync(async (req, res, next) => {
     })
   );
 });
+
+exports.stats = catchAsync(async (req, res, next) => {
+  let firstDay = new Date(2022, 0, 1);
+  let lastDay = new Date(3000, 11, 31);
+
+  let curr = new Date(); // get current date
+  let first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+  let last = first + 6; // last day is the first day + 6
+
+  let weekStart = new Date(curr.setDate(first + 1));
+  let weekEnd = new Date(curr.setDate(last + 1));
+
+  
+
+  if (req.params.startDate && req.params.endDate) {
+    firstDay = new Date(req.params.startDate);
+    lastDay = new Date(req.params.endDate);
+  }
+
+  let procurements = await Procurement.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: { month: { $month: "$createdAt" } },
+        totalAmount: { $sum: "$totalAmount" },
+        totalKg: { $sum: "$totalWeight" },
+        totalBags: { $sum: "$totalBags" },
+      },
+    },
+  ]);
+
+  const weekly = await Procurement.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gte: weekStart } },
+          { createdAt: { $lte: weekEnd } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: { day: { $dayOfWeek: "$createdAt" } },
+        totalAmount: { $sum: "$totalAmount" },
+        totalKg: { $sum: "$totalWeight" },
+        totalBags: { $sum: "$totalBags" },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "OK",
+    data: {
+      generalStats: procurements,
+      weeklyStats: weekly,
+    },
+  });
+});
