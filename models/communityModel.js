@@ -26,8 +26,8 @@ const communitySchema = new mongoose.Schema({
     },
   },
   numberOfFarmers: {
-    type: Number, 
-    default: 0
+    type: Number,
+    default: 0,
   },
   unitPrice: Number,
   createdBy: {
@@ -39,6 +39,8 @@ const communitySchema = new mongoose.Schema({
 communitySchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
+
+communitySchema.index({ "$**": "text" });
 
 const Community = mongoose.model("Community", communitySchema);
 module.exports = Community;

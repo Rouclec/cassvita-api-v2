@@ -15,7 +15,7 @@ const farmerSchema = new mongoose.Schema(
     },
     dateOfBirth: {
       type: Date,
-      validate: [validator.isDate, "Invalid date, please enter a correct date"]
+      validate: [validator.isDate, "Invalid date, please enter a correct date"],
     },
     gender: {
       type: String,
@@ -23,11 +23,11 @@ const farmerSchema = new mongoose.Schema(
     },
     farmSize: Number,
     numberOfFarms: {
-      type: Number, 
+      type: Number,
       default: 1,
     },
     averageInvestment: {
-      type: String
+      type: String,
     },
     community: {
       type: mongoose.Schema.ObjectId,
@@ -77,6 +77,8 @@ const farmerSchema = new mongoose.Schema(
 farmerSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
+
+farmerSchema.index({ "$**": "text" });
 
 farmerSchema.pre(/^find/, async function (next) {
   this.populate({

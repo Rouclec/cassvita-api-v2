@@ -1,7 +1,7 @@
 const Community = require("../models/communityModel");
 const Farmer = require("../models/farmerModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne, createOne } = require("./helperController");
+const { getAll, getOne, createOne, search } = require("./helperController");
 
 const multer = require("multer");
 const sharp = require("sharp");
@@ -452,3 +452,5 @@ exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
     })
   );
 });
+
+exports.searchFarmer = search(Farmer)

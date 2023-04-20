@@ -2,7 +2,7 @@ const Farmer = require("../models/farmerModel");
 const Payment = require("../models/paymentModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne } = require("./helperController");
+const { getAll, getOne, search } = require("./helperController");
 
 const multer = require("multer");
 const sharp = require("sharp");
@@ -225,3 +225,5 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
     data,
   });
 });
+
+exports.searchPayment = search(Payment)

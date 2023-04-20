@@ -61,6 +61,8 @@ procurementSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
+procurementSchema.index({ "$**": "text" });
+
 //Static middle ware to calculate payments and procurements for a certain PO
 procurementSchema.statics.calculate = async function (purchaseOrderId) {
   const stats = await this.aggregate([
@@ -81,7 +83,6 @@ procurementSchema.statics.calculate = async function (purchaseOrderId) {
     });
   }
 };
-
 
 procurementSchema.post("save", async function () {
   this.constructor.calculate(this.purchaseOrder);

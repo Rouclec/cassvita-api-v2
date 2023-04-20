@@ -1,5 +1,5 @@
 const Community = require("../models/communityModel");
-const { createOne, getOne, getAll, updateOne } = require("./helperController");
+const { createOne, getOne, getAll, updateOne, search } = require("./helperController");
 
 exports.createCommunity = createOne(Community, [
   "name",
@@ -17,3 +17,5 @@ exports.updateCommunity = updateOne(Community, [
   "communityHead",
   "unitPrice",
 ]);
+
+exports.searchCommunity = search(Community)

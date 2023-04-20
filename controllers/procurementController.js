@@ -5,7 +5,7 @@ const Payment = require("../models/paymentModel");
 const Procurement = require("../models/procumentModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne } = require("./helperController");
+const { getAll, getOne, search } = require("./helperController");
 
 exports.getAllProcurements = getAll(Procurement);
 exports.getProcurement = getOne(Procurement);
@@ -238,8 +238,6 @@ exports.stats = catchAsync(async (req, res, next) => {
   let weekStart = new Date(curr.setDate(first + 1));
   let weekEnd = new Date(curr.setDate(last + 1));
 
-  
-
   if (req.params.startDate && req.params.endDate) {
     firstDay = new Date(req.params.startDate);
     lastDay = new Date(req.params.endDate);
@@ -291,3 +289,5 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.searchProcurement = search(Procurement);

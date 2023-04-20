@@ -69,6 +69,8 @@ paymentSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",
 }); //enable beautifying on this schema
 
+paymentSchema.index({ "$**": "text" });
+
 paymentSchema.pre(/^find/, function (next) {
   this.populate({
     path: "farmer",

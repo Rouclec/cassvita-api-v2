@@ -6,10 +6,12 @@ const {
   updateProcurement,
   getProcurement,
   stats,
+  searchProcurement,
 } = require("../controllers/procurementController");
 
 const router = express.Router();
 router.use(protect);
+router.get("/search/:searchString", searchProcurement);
 router.get("/reports/:startDate?/:endDate?", stats);
 router
   .route("/")

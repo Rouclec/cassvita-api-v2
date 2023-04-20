@@ -7,10 +7,12 @@ const {
   uploadReceipt,
   resizePhoto,
   stats,
+  searchPayment,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
 router.use(protect);
+router.get("/search/:searchString", searchPayment);
 
 router.get("/", getAllPayments);
 

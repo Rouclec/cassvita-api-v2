@@ -5,10 +5,13 @@ const {
   createCommunity,
   updateCommunity,
   getCommunity,
+  searchCommunity,
 } = require("../controllers/communityController");
 
 const router = express.Router();
+
 router.use(protect);
+router.get("/search/:searchString", searchCommunity);
 router
   .route("/")
   .get(getAllCommunities)

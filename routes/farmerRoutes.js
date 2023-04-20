@@ -13,6 +13,7 @@ const {
   // uploadFarmersFromExcel,
   uploadXlFile,
   processXlFile,
+  searchFarmer,
 } = require("../controllers/farmerController");
 const {
   stats: allFarmerStats,
@@ -21,12 +22,13 @@ const {
 const router = express.Router();
 
 router.use(protect);
+router.get("/search/:searchString", searchFarmer);
 router.get("/reports/individual/:farmerId/:startDate?/:endDate?", farmerStats);
 router.get("/reports/:startDate?/:endDate?", allFarmerStats);
 router.post(
   "/upload-from-file",
   uploadXlFile,
-  processXlFile,
+  processXlFile
   // uploadFarmersFromExcel
 );
 router

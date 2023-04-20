@@ -100,3 +100,25 @@ exports.getAll = (Model) =>
       data: docs,
     });
   });
+
+exports.search = (Model) =>
+  catchAsync(async (req, res, next) => {
+    docs = await Model.find({
+      $text: { $search: req.params.searchString },
+    });
+
+    let page = "1 of 1";
+    // if (pageQuery && limitQuery) {
+    //   const pages = Math.ceil(count / limitQuery);
+    //   page = `${pageQuery} of ${pages}`;
+    // }
+
+    return next(
+      res.status(200).json({
+        status: "OK",
+        results: docs.length,
+        page: page,
+        data: docs,
+      })
+    );
+  });
