@@ -4,8 +4,10 @@ const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
 
-const { getAll, getOne} = require("./helperController");
+const { getAll, getOne } = require("./helperController");
 const catchAsync = require("../utils/catchAsync");
+const Payment = require("../models/paymentModel");
+const { default: mongoose } = require("mongoose");
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -80,7 +82,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
   const id = `PO-${date[1]}-${date[3].slice(-2)}`;
 
-  const existingPo = await PurchaseOrder.find({ id: id});
+  const existingPo = await PurchaseOrder.find({ id: id });
 
   if (existingPo.length > 0) {
     return next(
@@ -183,5 +185,50 @@ exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "OK",
     data,
+  });
+});
+
+exports.purchaseOrderReport = catchAsync(async (req, res, next) => {
+  let firstDay = new Date(2022, 0, 1);
+  let lastDay = new Date(3000, 11, 31);
+
+  if (req.params.startDate && req.params.endDate) {
+    firstDay = new Date(req.params.startDate);
+    lastDay = new Date(req.params.endDate);
+  }
+
+  let purchases = await PurchaseOrder.find({
+    $and: [{ createdAt: { $gt: firstDay } }, { createdAt: { $lte: lastDay } }],
+  });
+
+  const openPurchaseOrder = await PurchaseOrder.findOne({ status: "open" });
+
+  let payments;
+
+  const poObjectId = mongoose.Types.ObjectId(openPurchaseOrder?._id);
+
+  payments = await Payment.aggregate([
+    {
+      $match: { purchaseOrder: { $eq: poObjectId } },
+    },
+    {
+      $group: {
+        _id: "$status",
+        totalFarmers: { $sum: 1 },
+        totalAmount: { $sum: "$amount" },
+        totalWeight: { $sum: "$weight" },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "OK",
+    data: {
+      generalStats: purchases,
+      weeklyStats: {
+        openPo: openPurchaseOrder,
+        paymentStats: payments,
+      },
+    },
   });
 });

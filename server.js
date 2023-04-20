@@ -3,10 +3,7 @@ require("dotenv").config({ path: "./config.env" });
 
 const app = require("./app");
 
-const DB = process.env.DATABASE_CONNECTION_STRING.replace(
-  "<password>",
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE_CONNECTION_STRING
 mongoose
   .set("strictQuery", true)
   .connect(DB)

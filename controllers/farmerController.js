@@ -225,11 +225,10 @@ exports.createFarmer = catchAsync(async (req, res, next) => {
     profilePic = undefined;
   }
 
-
   if (req.body.dateOfBirth) {
     let date = new Date(req.body.dateOfBirth);
-    if(date.toString() !== 'Invalid Date'){
-      dateOfBirth = date
+    if (date.toString() !== "Invalid Date") {
+      dateOfBirth = date;
     }
   }
 
@@ -274,7 +273,7 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
 
   let profilePic = undefined;
   let community_id = undefined;
-  let dateOfBirth = undefined
+  let dateOfBirth = undefined;
 
   if (req.profilePic) {
     profilePic = req.profilePic;
@@ -282,8 +281,8 @@ exports.updateFarmer = catchAsync(async (req, res, next) => {
 
   if (req.body.dateOfBirth) {
     let date = new Date(req.body.dateOfBirth);
-    if(date.toString() !== 'Invalid Date'){
-      dateOfBirth = date
+    if (date.toString() !== "Invalid Date") {
+      dateOfBirth = date;
     }
   }
 
@@ -360,6 +359,7 @@ exports.stats = catchAsync(async (req, res, next) => {
   active = 0;
   inactive = 0;
   const thisMonth = new Date().getMonth();
+  console.log("this month: ", thisMonth);
   const communities = await Farmer.aggregate([
     {
       $group: {
@@ -432,10 +432,12 @@ exports.stats = catchAsync(async (req, res, next) => {
     lowestPaid: lowestPaid,
   };
 
-  res.status(200).json({
-    status: "OK",
-    data: response,
-  });
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: response,
+    })
+  );
 });
 
 exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
@@ -453,4 +455,4 @@ exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
   );
 });
 
-exports.searchFarmer = search(Farmer)
+exports.searchFarmer = search(Farmer);
