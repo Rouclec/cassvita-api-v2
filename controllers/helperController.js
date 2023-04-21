@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+const Farmer = require("../models/farmerModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
 
@@ -103,20 +105,63 @@ exports.getAll = (Model) =>
 
 exports.search = (Model) =>
   catchAsync(async (req, res, next) => {
-    docs = await Model.find({
-      $text: { $search: req.params.searchString },
-    });
+    let docs = [];
+    let count = 0;
 
     let page = "1 of 1";
-    // if (pageQuery && limitQuery) {
-    //   const pages = Math.ceil(count / limitQuery);
-    //   page = `${pageQuery} of ${pages}`;
-    // }
+
+    if (req.query.page && req.query.limit) {
+      let paginate = req.query.page - 1;
+      limit = req.query.limit;
+      count = await Model.count({
+        $text: { $search: req.params.searchString },
+      });
+      const pages = Math.ceil(count / limit);
+      page = `${paginate + 1} of ${pages}`;
+      docs = await Model.find({
+        $text: { $search: req.params.searchString },
+      })
+        .skip(paginate)
+        .limit(limit);
+    } else {
+      docs = await Model.find({
+        $text: { $search: req.params.searchString },
+      });
+      count = docs.length;
+    }
+
+    if (docs.length === 0) {
+      const farmer = await Farmer.find({
+        $text: { $search: req.params.searchString },
+      });
+
+      if (farmer.length > 0) {
+        const farmerId = mongoose.Types.ObjectId(farmer[0]._id);
+        if (req.query.page && req.query.limit) {
+          const paginate = req.query.page - 1;
+          const limit = req.query.limit;
+          count = await Model.count({ farmer: farmerId });
+          const tempPages = Math.ceil(count / limit);
+          console.log("pages and count for farmer name: ", tempPages, count);
+          page = `page ${paginate + 1} of ${tempPages}`;
+          docs = await Model.find({
+            farmer: farmerId,
+          })
+            .skip(paginate)
+            .limit(limit);
+        } else {
+          docs = await Model.find({
+            farmer: farmerId,
+          });
+          count = docs.length;
+        }
+      }
+    }
 
     return next(
       res.status(200).json({
         status: "OK",
-        results: docs.length,
+        results: count,
         page: page,
         data: docs,
       })

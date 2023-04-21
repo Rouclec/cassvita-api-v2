@@ -176,7 +176,6 @@ exports.stats = catchAsync(async (req, res, next) => {
   const farmers = await Farmer.find();
 
   purchases.forEach(async (purchase) => {
-    // console.log('farmer name: ', purchase._id.toString());
     purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
     purchase.farmer = farmers.find(
       (farmer) => farmer.id === purchase._id.toString()
