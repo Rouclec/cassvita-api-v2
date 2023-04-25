@@ -17,9 +17,12 @@ router.use(protect);
 router.get("/reports/:startDate?/:endDate?", purchaseOrderReport);
 router
   .route("/")
-  .get(restrictTo("admin", "ceo", "manager"), getAllPurchaseOrder)
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    getAllPurchaseOrder
+  )
   .post(
-    restrictTo("admin", "ceo", "manager"),
+    restrictTo("accountant", "admin", "procurement-officer"),
     uploadBdc,
     resizePhoto,
     createPurchaseOrder
@@ -27,13 +30,19 @@ router
 
 router
   .route("/stats")
-  .get(restrictTo("admin", "ceo", "manager"), purchaseOrderStats);
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    purchaseOrderStats
+  );
 
 router
   .route("/:id")
-  .get(restrictTo("admin", "ceo", "manager"), getPurchaseOrder)
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    getPurchaseOrder
+  )
   .patch(
-    restrictTo("admin", "ceo", "manager"),
+    restrictTo("accountant", "admin", "procurement-officer"),
     uploadBdc,
     resizePhoto,
     updatePurchaseOrder
@@ -41,6 +50,9 @@ router
 
 router
   .route("/:id/close")
-  .get(restrictTo("admin", "ceo", "manager"), closePurchaseOrder);
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    closePurchaseOrder
+  );
 
 module.exports = router;

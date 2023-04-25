@@ -33,25 +33,35 @@ router.post(
 );
 router
   .route("/")
-  .get(restrictTo("admin", "ceo", "manager"), getAllFarmers)
+  .get(restrictTo("accountant", "admin", "procurement-officer"), getAllFarmers)
   .post(
-    restrictTo("admin", "ceo", "manager"),
+    restrictTo("accountant", "admin", "procurement-officer"),
     uploadProfilePic,
     resizePhoto,
     createFarmer
   );
 router
   .route("/:id/remove-from-community")
-  .get(restrictTo("admin", "ceo", "manager"), removeFromCommunity);
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    removeFromCommunity
+  );
 router
   .route("/community/:communityId")
-  .get(restrictTo("admin", "ceo", "manager"), getAllFarmersFromCommunity);
-router.get("/stats", restrictTo("admin", "ceo", "manager"), stats);
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    getAllFarmersFromCommunity
+  );
+router.get(
+  "/stats",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  stats
+);
 router
   .route("/:id")
-  .get(restrictTo("admin", "ceo", "manager"), getFarmer)
+  .get(restrictTo("accountant", "admin", "procurement-officer"), getFarmer)
   .patch(
-    restrictTo("admin", "ceo", "manager"),
+    restrictTo("accountant", "admin", "procurement-officer"),
     uploadProfilePic,
     resizePhoto,
     updateFarmer

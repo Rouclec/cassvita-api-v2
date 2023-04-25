@@ -19,7 +19,7 @@ router.get("/", getAllPayments);
 router.get("/:id", getPayment);
 router.patch(
   "/:id/:status",
-  restrictTo("admin", "manager", "ceo"),
+  restrictTo("accountant", "admin", "procurement-officer"),
   uploadReceipt,
   resizePhoto,
   changePaymentStatus

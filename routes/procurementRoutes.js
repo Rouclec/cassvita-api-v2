@@ -16,11 +16,17 @@ router.get("/reports/:startDate?/:endDate?", stats);
 router
   .route("/")
   .get(getAllProcurements)
-  .post(restrictTo("admin", "manager", "ceo"), createProcurement);
+  .post(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    createProcurement
+  );
 
 router
   .route("/:id")
-  .patch(restrictTo("admin", "manager", "ceo"), updateProcurement)
+  .patch(
+    restrictTo("accountant", "admin", "procurement-officer"),
+    updateProcurement
+  )
   .get(getProcurement);
 
 module.exports = router;

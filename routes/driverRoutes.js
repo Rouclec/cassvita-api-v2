@@ -12,11 +12,11 @@ const router = express.Router();
 router.use(protect);
 router
   .route("/")
-  .get(restrictTo("admin", "ceo", "manager"), getAllDrivers)
-  .post(restrictTo("admin", "ceo", "manager"), createDriver);
+  .get(restrictTo("accountant", "admin", "procurement-officer"), getAllDrivers)
+  .post(restrictTo("accountant", "admin", "procurement-officer"), createDriver);
 router
   .route("/:id")
-  .get(restrictTo("admin", "ceo", "manager"), getDriver)
-  .patch(restrictTo("admin", "ceo", "manager"), updateDriver);
+  .get(restrictTo("accountant", "admin", "procurement-officer"), getDriver)
+  .patch(restrictTo("accountant", "admin", "procurement-officer"), updateDriver);
 
 module.exports = router;
