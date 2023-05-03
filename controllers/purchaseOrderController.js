@@ -8,6 +8,7 @@ const { getAll, getOne } = require("./helperController");
 const catchAsync = require("../utils/catchAsync");
 const Payment = require("../models/paymentModel");
 const { default: mongoose } = require("mongoose");
+const Procurement = require("../models/procumentModel");
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -160,27 +161,48 @@ exports.closePurchaseOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
-  let lowest = await PurchaseOrder.aggregate([
-    { $sort: { quantity: 1 } },
-    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
-    { $replaceWith: "$doc_with_max_ver" },
+  let currentPO = await PurchaseOrder.findOne({ status: "open" });
+  const poObjectId = mongoose.Types.ObjectId(currentPO?._id);
+  let amountPercentage = 0;
+  let weightPercentage = 0;
+  const today = new Date();
+
+  const procurements = await Procurement.aggregate([
+    {
+      $match: { purchaseOrder: { $eq: poObjectId } },
+    },
+    {
+      $group: {
+        _id: "",
+        totalAmount: { $sum: "$totalAmount" },
+        totalWeight: { $sum: "$totalWeight" },
+      },
+    },
   ]);
+  const daysLeft = Math.round((new Date(currentPO?.endDate) - today) / (1000 * 60 * 60 * 24));
 
-  let highest = await PurchaseOrder.aggregate([
-    { $sort: { quantity: -1 } },
-    { $group: { _id: "$name", doc_with_max_ver: { $first: "$$ROOT" } } },
-    { $replaceWith: "$doc_with_max_ver" },
-  ]);
 
-  lowest[0].bdc = undefined;
-  highest[0].bdc = undefined;
-
-  let currentPO = await PurchaseOrder.findOne({ status: "active" });
+  if (procurements[0].totalAmount) {
+    amountPercentage = (
+      (procurements[0].totalAmount * 100) /
+      currentPO?.amount
+    ).toFixed(2);
+  }
+  if (procurements[0].totalWeight) {
+    weightPercentage = (
+      (procurements[0].totalWeight * 100) /
+      currentPO?.quantity
+    ).toFixed(2);
+  }
 
   let data = {
-    lowestPO: lowest[0],
-    highestPO: highest[0],
-    currentPO,
+    poId: currentPO?.id,
+    weight: currentPO?.quantity,
+    weightPercentage: weightPercentage * 1,
+    amount: currentPO?.amount,
+    amountPercentage: amountPercentage * 1,
+    procurements: currentPO?.totalProcurements,
+    daysLeft,
   };
   res.status(200).json({
     status: "OK",

@@ -38,7 +38,7 @@ const createAuthToken = (user, statusCode, res) => {
 };
 
 exports.addUser = catchAsync(async (req, res, next) => {
-  const { fullName, username, email, password, passwordConfirm, role } =
+  const { fullName, username, email, password, phoneNumber, passwordConfirm, role } =
     req.body;
 
   const userRole = await Role.findOne({
@@ -50,6 +50,7 @@ exports.addUser = catchAsync(async (req, res, next) => {
     username,
     email,
     password,
+    phoneNumber,
     passwordConfirm,
     createdBy: req.user._id,
     role: userRole._id,
