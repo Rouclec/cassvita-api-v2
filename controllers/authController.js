@@ -38,12 +38,28 @@ const createAuthToken = (user, statusCode, res) => {
 };
 
 exports.addUser = catchAsync(async (req, res, next) => {
-  const { fullName, username, email, password, phoneNumber, passwordConfirm, role } =
-    req.body;
+  const {
+    fullName,
+    username,
+    email,
+    password,
+    phoneNumber,
+    passwordConfirm,
+    role,
+  } = req.body;
 
   const userRole = await Role.findOne({
     code: slugify(role, { lower: true }),
   });
+
+  if (!userRole) {
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: `No such role, ${role} found`,
+      })
+    );
+  }
 
   const newUser = {
     fullName,
