@@ -11,22 +11,27 @@ const {
 
 const router = express.Router();
 router.use(protect);
-router.get("/search/:searchString", searchProcurement);
-router.get("/reports/:startDate?/:endDate?", stats);
+router.get(
+  "/search/:searchString",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  searchProcurement
+);
+router.get(
+  "/reports/:startDate?/:endDate?",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  stats
+);
 router
   .route("/")
   .get(getAllProcurements)
-  .post(
-    restrictTo("accountant", "admin", "procurement-officer"),
-    createProcurement
-  );
+  .post(restrictTo("admin", "procurement-officer"), createProcurement);
 
 router
   .route("/:id")
-  .patch(
+  .patch(restrictTo("admin", "procurement-officer"), updateProcurement)
+  .get(
     restrictTo("accountant", "admin", "procurement-officer"),
-    updateProcurement
-  )
-  .get(getProcurement);
+    getProcurement
+  );
 
 module.exports = router;

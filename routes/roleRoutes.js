@@ -7,7 +7,7 @@ const {
 } = require("../controllers/roleController");
 const router = express.Router();
 
-router.route("/").post(createRole).get(getAllRoles);
-router.route("/:id").get(getRole).patch(updateRole);
+router.route("/").post(restrictTo("admin"), createRole).get(getAllRoles);
+router.route("/:id").get(getRole).patch(restrictTo("admin"), updateRole);
 
 module.exports = router;

@@ -18,11 +18,11 @@ router.get("/reports/:startDate?/:endDate?", purchaseOrderReport);
 router
   .route("/")
   .get(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("accountant","admin", "procurement-officer"),
     getAllPurchaseOrder
   )
   .post(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("admin", "procurement-officer"),
     uploadBdc,
     resizePhoto,
     createPurchaseOrder
@@ -42,7 +42,7 @@ router
     getPurchaseOrder
   )
   .patch(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("admin", "procurement-officer"),
     uploadBdc,
     resizePhoto,
     updatePurchaseOrder
@@ -51,7 +51,7 @@ router
 router
   .route("/:id/close")
   .get(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("admin", "procurement-officer"),
     closePurchaseOrder
   );
 

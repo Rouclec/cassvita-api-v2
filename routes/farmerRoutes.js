@@ -10,7 +10,6 @@ const {
   resizePhoto,
   getAllFarmersFromCommunity,
   removeFromCommunity,
-  // uploadFarmersFromExcel,
   uploadXlFile,
   processXlFile,
   searchFarmer,
@@ -22,14 +21,26 @@ const {
 const router = express.Router();
 
 router.use(protect);
-router.get("/search/:searchString", searchFarmer);
-router.get("/reports/individual/:farmerId/:startDate?/:endDate?", farmerStats);
-router.get("/reports/:startDate?/:endDate?", allFarmerStats);
+router.get(
+  "/search/:searchString",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  searchFarmer
+);
+router.get(
+  "/reports/individual/:farmerId/:startDate?/:endDate?",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  farmerStats
+);
+router.get(
+  "/reports/:startDate?/:endDate?",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  allFarmerStats
+);
 router.post(
   "/upload-from-file",
+  restrictTo("accountant", "admin", "procurement-officer"),
   uploadXlFile,
   processXlFile
-  // uploadFarmersFromExcel
 );
 router
   .route("/")

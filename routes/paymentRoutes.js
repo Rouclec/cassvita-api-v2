@@ -12,14 +12,18 @@ const {
 
 const router = express.Router();
 router.use(protect);
-router.get("/search/:searchString", searchPayment);
+router.get(
+  "/search/:searchString",
+  restrictTo("accountant", "admin"),
+  searchPayment
+);
 
-router.get("/", getAllPayments);
+router.get("/", restrictTo("accountant", "admin"), getAllPayments);
 
-router.get("/:id", getPayment);
+router.get("/:id", restrictTo("accountant", "admin"), getPayment);
 router.patch(
   "/:id/:status",
-  restrictTo("accountant", "admin", "procurement-officer"),
+  restrictTo("accountant", "admin"),
   uploadReceipt,
   resizePhoto,
   changePaymentStatus

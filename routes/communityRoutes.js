@@ -11,12 +11,19 @@ const {
 const router = express.Router();
 
 router.use(protect);
-router.get("/search/:searchString", searchCommunity);
+router.get(
+  "/search/:searchString",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  searchCommunity
+);
 router
   .route("/")
   .get(getAllCommunities)
-  .post(restrictTo("admin", "manager", "ceo"), createCommunity);
+  .post(restrictTo("admin", "procurement-officer"), createCommunity);
 
-router.route("/:id").patch(updateCommunity).get(getCommunity);
+router
+  .route("/:id")
+  .patch(restrictTo("admin", "procurement-officer"), updateCommunity)
+  .get(getCommunity);
 
 module.exports = router;
