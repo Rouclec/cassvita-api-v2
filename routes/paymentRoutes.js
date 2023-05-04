@@ -8,6 +8,7 @@ const {
   resizePhoto,
   stats,
   searchPayment,
+  getGeneralPaymentStats,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
@@ -19,6 +20,11 @@ router.get(
 );
 
 router.get("/", restrictTo("accountant", "admin"), getAllPayments);
+router.get(
+  "/general-stats",
+  restrictTo("accountant", "admin"),
+  getGeneralPaymentStats
+);
 
 router.get("/:id", restrictTo("accountant", "admin"), getPayment);
 router.patch(

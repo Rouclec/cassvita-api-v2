@@ -76,6 +76,26 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPayments = getAll(Payment);
 exports.getPayment = getOne(Payment);
 
+exports.getGeneralPaymentStats = catchAsync(async (req,res,next) => {
+  const payments = await Payment.aggregate([
+    {
+      $group: {
+        _id: "",
+        totalPayment: { $sum: "$amount" },
+        highestPayment: { $max: "$amount" },
+        lowestPayment: { $min: "$amount" },
+      },
+    },
+  ]);
+
+  return next(
+    res.status(200).json({
+      status: 'OK',
+      data: payments
+    })
+  )
+})
+
 exports.changePaymentStatus = catchAsync(async (req, res, next) => {
   const { status, id } = req.params;
 
@@ -96,12 +116,6 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
     });
   }
 
-  // if (paymentFound.status !== "Pending") {
-  //   return res.status(500).json({
-  //     status: "Serer error",
-  //     message: "Something went wrong",
-  //   });
-  // }
 
   if (status === "Paid") {
     const farmerFound = await Farmer.findById(paymentFound.farmer._id);
