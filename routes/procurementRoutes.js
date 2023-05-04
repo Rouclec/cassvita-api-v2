@@ -7,10 +7,16 @@ const {
   getProcurement,
   stats,
   searchProcurement,
+  generalStats,
 } = require("../controllers/procurementController");
 
 const router = express.Router();
 router.use(protect);
+router.get(
+  "/general-stats",
+  restrictTo("accountant", "admin", "procurement-officer"),
+  generalStats
+);
 router.get(
   "/search/:searchString",
   restrictTo("accountant", "admin", "procurement-officer"),

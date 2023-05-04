@@ -198,6 +198,8 @@ exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
   let data = {
     poId: currentPO?.id,
     weight: currentPO?.quantity,
+    startDate: currentPO?.startDate,
+    endDate: currentPO?.endDate,
     weightPercentage: weightPercentage * 1,
     amount: currentPO?.amount,
     amountPercentage: amountPercentage * 1,

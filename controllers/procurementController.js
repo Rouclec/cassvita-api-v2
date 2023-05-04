@@ -227,6 +227,105 @@ exports.closeProcurement = catchAsync(async (req, res, next) => {
   );
 });
 
+exports.generalStats = catchAsync(async (req, res, next) => {
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+  const lastMonthStart = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(date.getFullYear(), date.getMonth(), 0);
+
+  const procurements = await Payment.find({
+    $and: [{ createdAt: { $gt: firstDay } }, { createdAt: { $lte: lastDay } }],
+  }).distinct("procurement");
+
+  const lastProcurements = await Payment.find({
+    $and: [
+      { createdAt: { $gt: lastMonthStart } },
+      { createdAt: { $lte: lastMonthEnd } },
+    ],
+  }).distinct("procurement");
+
+  const farmers = await Payment.find({
+    $and: [{ createdAt: { $gt: firstDay } }, { createdAt: { $lte: lastDay } }],
+  }).distinct("farmer");
+
+  const lastFarmers = await Payment.find({
+    $and: [
+      { createdAt: { $gt: lastMonthStart } },
+      { createdAt: { $lte: lastMonthEnd } },
+    ],
+  }).distinct("farmer");
+
+  const communities = await Procurement.find({
+    $and: [{ createdAt: { $gt: firstDay } }, { createdAt: { $lte: lastDay } }],
+  }).distinct("community");
+
+  const lastCommunities = await Procurement.find({
+    $and: [
+      { createdAt: { $gt: lastMonthStart } },
+      { createdAt: { $lte: lastMonthEnd } },
+    ],
+  }).distinct("community");
+
+  const payments = await Payment.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "",
+        totalAmount: { $sum: "$amount" },
+        totalWeight: { $sum: "$weight" },
+      },
+    },
+  ]);
+
+  const data = {
+    totalAmount: payments[0]?.totalAmount || 0,
+    totalWeight: payments[0]?.totalWeight || 0,
+    community: {
+      count: communities?.length,
+      compare:
+        communities?.length > lastCommunities?.length
+          ? "greater"
+          : communities?.length < lastCommunities?.length
+          ? "less"
+          : "equal",
+    },
+    farmers: {
+      count: farmers?.length,
+      compare:
+        farmers?.length > lastFarmers?.length
+          ? "greater"
+          : farmers?.length < lastFarmers?.length
+          ? "less"
+          : "equal",
+    },
+    procurements: {
+      count: procurements?.length,
+      compare:
+        procurements?.length > lastProcurements?.length
+          ? "greater"
+          : procurements?.length < lastProcurements?.length
+          ? "less"
+          : "equal",
+    },
+  };
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data,
+    })
+  );
+});
+
 exports.stats = catchAsync(async (req, res, next) => {
   let firstDay = new Date(2022, 0, 1);
   let lastDay = new Date(3000, 11, 31);
