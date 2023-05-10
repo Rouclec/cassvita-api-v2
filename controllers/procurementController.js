@@ -268,6 +268,13 @@ exports.generalStats = catchAsync(async (req, res, next) => {
     ],
   }).distinct("community");
 
+  const lastPayments = await Payment.find({
+    $and: [
+      { createdAt: { $gt: lastMonthStart } },
+      { createdAt: { $lte: lastMonthEnd } },
+    ],
+  });
+
   const payments = await Payment.aggregate([
     {
       $match: {
@@ -282,6 +289,7 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         _id: "",
         totalAmount: { $sum: "$amount" },
         totalWeight: { $sum: "$weight" },
+        total: { $sum: 1 },
       },
     },
   ]);
@@ -289,7 +297,7 @@ exports.generalStats = catchAsync(async (req, res, next) => {
   const data = {
     totalAmount: payments[0]?.totalAmount || 0,
     totalWeight: payments[0]?.totalWeight || 0,
-    community: {
+    communities: {
       count: communities?.length,
       compare:
         communities?.length > lastCommunities?.length
@@ -313,6 +321,15 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         procurements?.length > lastProcurements?.length
           ? "greater"
           : procurements?.length < lastProcurements?.length
+          ? "less"
+          : "equal",
+    },
+    payments: {
+      count: payments[0]?.total || 0,
+      compare:
+        (payments[0]?.total || 0) > lastPayments?.length
+          ? "greater"
+          : (payments[0]?.total || 0) < lastPayments?.length
           ? "less"
           : "equal",
     },
