@@ -8,7 +8,7 @@ const corsOptions = {
   origin: [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://cassvita-test-app-git-master-fonkwe.vercel.app",
+    "https://cassvita-web.vercel.app",
     "https://cassvita.vercel.app",
     "https://app.cassvita.com",
   ],
