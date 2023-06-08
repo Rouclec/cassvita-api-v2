@@ -24,11 +24,6 @@ const userSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       validate: [validator.isMobilePhone, "Please enter a valid phone number"],
-      index: {
-        unique: true,
-        sparse: true,
-        partialFilterExpression: { phoneNumber: { $type: "string" } },
-      },
     },
     role: {
       type: mongoose.Schema.ObjectId,
