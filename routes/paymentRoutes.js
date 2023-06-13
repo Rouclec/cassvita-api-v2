@@ -21,7 +21,7 @@ router.get(
 
 router.get("/", restrictTo("accountant", "admin"), getAllPayments);
 router.get(
-  "/general-stats",
+  "/stats",
   restrictTo("accountant", "admin"),
   getGeneralPaymentStats
 );
