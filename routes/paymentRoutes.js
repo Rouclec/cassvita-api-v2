@@ -6,7 +6,6 @@ const {
   changePaymentStatus,
   uploadReceipt,
   resizePhoto,
-  stats,
   searchPayment,
   getGeneralPaymentStats,
 } = require("../controllers/paymentController");

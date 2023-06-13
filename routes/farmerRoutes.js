@@ -32,7 +32,7 @@ router.get(
   farmerStats
 );
 router.get(
-  "/reports/:startDate?/:endDate?",
+  "/reports/:startDate?/:endDate?/:community?",
   restrictTo("accountant", "admin", "procurement-officer"),
   allFarmerStats
 );

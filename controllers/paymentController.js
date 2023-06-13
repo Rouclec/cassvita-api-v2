@@ -10,6 +10,7 @@ const fs = require("fs");
 const aws = require("aws-sdk");
 const Procurement = require("../models/procumentModel");
 const { default: mongoose } = require("mongoose");
+const Community = require("../models/communityModel");
 
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
@@ -76,7 +77,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPayments = getAll(Payment);
 exports.getPayment = getOne(Payment);
 
-exports.getGeneralPaymentStats = catchAsync(async (req,res,next) => {
+exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
   const payments = await Payment.aggregate([
     {
       $group: {
@@ -90,11 +91,11 @@ exports.getGeneralPaymentStats = catchAsync(async (req,res,next) => {
 
   return next(
     res.status(200).json({
-      status: 'OK',
-      data: payments
+      status: "OK",
+      data: payments,
     })
-  )
-})
+  );
+});
 
 exports.changePaymentStatus = catchAsync(async (req, res, next) => {
   const { status, id } = req.params;
@@ -115,7 +116,6 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
       message: "Payment not found",
     });
   }
-
 
   if (status === "Paid") {
     const farmerFound = await Farmer.findById(paymentFound.farmer._id);
@@ -163,6 +163,7 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
 exports.stats = catchAsync(async (req, res, next) => {
   let firstDay = new Date(2022, 0, 1);
   let lastDay = new Date(3000, 11, 31);
+  let community = await Community.findOne({ name: req.params.community });
 
   if (req.params.startDate && req.params.endDate) {
     firstDay = new Date(req.params.startDate);
@@ -187,14 +188,24 @@ exports.stats = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-  const farmers = await Farmer.find();
+  let farmers = [];
+
+  if (community) {
+    farmers = await Farmer.find({ community: community._id.toString() });
+  } else {
+    farmers = await Farmer.find();
+  }
 
   purchases.forEach(async (purchase) => {
     purchase.totalTon = (purchase.totalKg / 907.2).toFixed(2) * 1;
-    purchase.farmer = farmers.find(
-      (farmer) => farmer.id === purchase._id.toString()
-    )?.name;
+    purchase.farmer = farmers.find((farmer) => {
+      return farmer._id.equals(purchase._id);
+    });
   });
+
+  // purchases.filter(purchase => )
+  purchases = purchases.filter((purchase) => farmers.includes(purchase.farmer));
+
   res.status(200).json({
     status: "OK",
     data: purchases,
@@ -220,7 +231,9 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
       { status: { $eq: "Paid" } },
       { farmer: { $eq: farmerObjectId } },
     ],
-  }).select("-farmer -procurement -createdBy -month -updatedBy -updatedOn -purchaseOrder");
+  }).select(
+    "-farmer -procurement -createdBy -month -updatedBy -updatedOn -purchaseOrder"
+  );
   const farmer = await Farmer.findById(farmerId);
 
   let data = {
@@ -239,4 +252,4 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.searchPayment = search(Payment)
+exports.searchPayment = search(Payment);
