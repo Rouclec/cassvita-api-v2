@@ -267,7 +267,15 @@ exports.updatePasswword = catchAsync(async (req, res, next) => {
     );
   }
 
-  const user = await User.findById(req.user.id).select("+password");
+  const user = await User.findById(req?.user?.id).select("+password");
+  if (!user) {
+    return next(
+      res.status(401).json({
+        status: "Unauthorized",
+        message: "You must be logged in to perfom this action",
+      })
+    );
+  }
   // 2) Check if current password is correct
   if (!(await user.comparePassword(currentPassword))) {
     return next(
