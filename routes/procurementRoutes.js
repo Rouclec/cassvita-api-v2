@@ -13,7 +13,7 @@ const {
 const router = express.Router();
 router.use(protect);
 router.get(
-  "/general-stats",
+  "/stats",
   restrictTo("accountant", "admin", "procurement-officer"),
   generalStats
 );
