@@ -142,7 +142,6 @@ exports.search = (Model) =>
           const limit = req.query.limit;
           count = await Model.count({ farmer: farmerId });
           const tempPages = Math.ceil(count / limit);
-          console.log("pages and count for farmer name: ", tempPages, count);
           page = `page ${paginate + 1} of ${tempPages}`;
           docs = await Model.find({
             farmer: farmerId,
