@@ -179,16 +179,17 @@ exports.purchaseOrderStats = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-  const daysLeft = Math.round((new Date(currentPO?.endDate) - today) / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.round(
+    (new Date(currentPO?.endDate) - today) / (1000 * 60 * 60 * 24)
+  );
 
-
-  if (procurements[0].totalAmount) {
+  if (procurements[0]?.totalAmount) {
     amountPercentage = (
       (procurements[0].totalAmount * 100) /
       currentPO?.amount
     ).toFixed(2);
   }
-  if (procurements[0].totalWeight) {
+  if (procurements[0]?.totalWeight) {
     weightPercentage = (
       (procurements[0].totalWeight * 100) /
       currentPO?.quantity
