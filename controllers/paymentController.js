@@ -92,7 +92,7 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
   return next(
     res.status(200).json({
       status: "OK",
-      data: payments,
+      data: payments[0],
     })
   );
 });
@@ -253,3 +253,4 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
 });
 
 exports.searchPayment = search(Payment);
+

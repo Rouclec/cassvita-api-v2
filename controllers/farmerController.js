@@ -110,6 +110,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 });
 
 const fileStorage = multer.diskStorage({
+  //_dirname will be ../../../controller. but, we want to save the file in ../../../public/files/farmer-data
   destination: __dirname.replace("controllers", "public/files/farmer-data"),
   filename: function (req, file, cb) {
     //req.body is empty... here is where req.body.new_file_name doesn't exists
