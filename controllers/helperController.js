@@ -97,7 +97,7 @@ exports.getAll = (Model) =>
     }
     res.status(200).json({
       status: "OK",
-      results: docs.length,
+      results: count,
       page: page,
       data: docs,
     });
