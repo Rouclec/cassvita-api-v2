@@ -8,6 +8,7 @@ const {
   stats,
   searchProcurement,
   generalStats,
+  overview,
 } = require("../controllers/procurementController");
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.get(
   restrictTo("accountant", "admin", "procurement-officer"),
   generalStats
 );
+router.get('/overview', restrictTo('accountant', 'admin', 'procurement-officer'), overview);
 router.get(
   "/search/:searchString",
   restrictTo("accountant", "admin", "procurement-officer"),

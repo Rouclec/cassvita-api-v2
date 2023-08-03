@@ -55,9 +55,8 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     );
   }
 
-  const id = `P-${new Date().toDateString().split(" ")[2]}-${
-    purchaseOrder.split("-")[1]
-  }-${purchaseOrder.split("-")[2]}`;
+  const id = `P-${new Date().toDateString().split(" ")[2]}-${purchaseOrder.split("-")[1]
+    }-${purchaseOrder.split("-")[2]}`;
 
   const procurement = {
     driver,
@@ -173,9 +172,8 @@ exports.updateProcurement = catchAsync(async (req, res, next) => {
     );
   }
 
-  const id = `P-${new Date().toDateString().split(" ")[2]}-${
-    purchaseOrder.split("-")[1]
-  }-${purchaseOrder.split("-")[2]}`;
+  const id = `P-${new Date().toDateString().split(" ")[2]}-${purchaseOrder.split("-")[1]
+    }-${purchaseOrder.split("-")[2]}`;
 
   const procurement = {
     driver: driverId._id,
@@ -303,8 +301,8 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         communities?.length > lastCommunities?.length
           ? "greater"
           : communities?.length < lastCommunities?.length
-          ? "less"
-          : "equal",
+            ? "less"
+            : "equal",
     },
     farmers: {
       count: farmers?.length,
@@ -312,8 +310,8 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         farmers?.length > lastFarmers?.length
           ? "greater"
           : farmers?.length < lastFarmers?.length
-          ? "less"
-          : "equal",
+            ? "less"
+            : "equal",
     },
     procurements: {
       count: procurements?.length,
@@ -321,8 +319,8 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         procurements?.length > lastProcurements?.length
           ? "greater"
           : procurements?.length < lastProcurements?.length
-          ? "less"
-          : "equal",
+            ? "less"
+            : "equal",
     },
     payments: {
       count: payments[0]?.total || 0,
@@ -330,8 +328,8 @@ exports.generalStats = catchAsync(async (req, res, next) => {
         (payments[0]?.total || 0) > lastPayments?.length
           ? "greater"
           : (payments[0]?.total || 0) < lastPayments?.length
-          ? "less"
-          : "equal",
+            ? "less"
+            : "equal",
     },
   };
 
@@ -404,6 +402,41 @@ exports.stats = catchAsync(async (req, res, next) => {
       weeklyStats: weekly,
     },
   });
+});
+
+
+exports.overview = catchAsync(async (req, res, next) => {
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth() - 4, 1);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() - 3, 0);
+
+
+
+  const procurements = await Procurement.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$status",
+        totalAmount: { $sum: "$totalAmount" },
+        totalWeight: { $sum: "$totalWeight" },
+        total: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: procurements || [],
+    })
+  );
 });
 
 exports.searchProcurement = search(Procurement);
