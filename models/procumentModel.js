@@ -110,7 +110,7 @@ procurementSchema.pre(/^find/, function (next) {
     .populate({
       path: "community",
     })
-    .populate("payments");
+    .populate("payments").populate('purchaseOrder');
   next();
 });
 
