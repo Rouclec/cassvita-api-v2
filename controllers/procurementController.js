@@ -407,8 +407,8 @@ exports.stats = catchAsync(async (req, res, next) => {
 
 exports.overview = catchAsync(async (req, res, next) => {
   const date = new Date();
-  const firstDay = new Date(date.getFullYear(), date.getMonth() - 4, 1);
-  const lastDay = new Date(date.getFullYear(), date.getMonth() - 3, 0);
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() - 1, 0);
 
 
 
