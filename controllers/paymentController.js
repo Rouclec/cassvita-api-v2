@@ -301,6 +301,7 @@ exports.getPaymentsFromProcurement = catchAsync(async (req, res, next) => {
   return next(
     res.status(200).json({
       status: 'OK',
+      results: payments.length,
       data: payments
     })
   )
