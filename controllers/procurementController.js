@@ -409,7 +409,11 @@ exports.stats = catchAsync(async (req, res, next) => {
 exports.overview = catchAsync(async (req, res, next) => {
   const date = new Date();
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-  const lastDay = new Date(date.getFullYear(), date.getMonth() - 1, 0);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+  console.log('today: ', date)
+  console.log('first and last days: ', firstDay, lastDay)
+  console.log('compare: ', date > firstDay, date <= lastDay)
 
   const procurements = await Procurement.aggregate([
     {
