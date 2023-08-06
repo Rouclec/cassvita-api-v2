@@ -5,7 +5,10 @@ const { v4: uuidv4 } = require("uuid");
 
 const procurementSchema = new mongoose.Schema(
   {
-    id: String,
+    id: {
+      type: String,
+      unique: true
+    },
     purchaseOrder: {
       type: mongoose.Schema.ObjectId,
       ref: "PurchaseOrder",

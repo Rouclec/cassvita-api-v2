@@ -6,6 +6,7 @@ const Procurement = require("../models/procumentModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
 const { getAll, getOne, search } = require("./helperController");
+const { v4: uuidv4 } = require("uuid");
 
 exports.getAllProcurements = getAll(Procurement);
 exports.getProcurement = getOne(Procurement);
@@ -56,7 +57,7 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
   }
 
   const id = `P-${new Date().toDateString().split(" ")[2]}-${purchaseOrder.split("-")[1]
-    }-${purchaseOrder.split("-")[2]}`;
+    }-${purchaseOrder.split("-")[2]}-${uuidv4().slice(0, 5)}`;
 
   const procurement = {
     driver,
