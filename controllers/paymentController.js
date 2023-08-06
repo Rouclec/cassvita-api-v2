@@ -94,7 +94,8 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
     {
       $group: {
         _id: "$status",
-        total: { $sum: "$amount" },
+        amount: { $sum: "$amount" },
+        total: { $sum: 1 }
       },
     },
   ]);
