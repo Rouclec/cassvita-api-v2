@@ -74,7 +74,6 @@ paymentSchema.index({ "$**": "text" });
 paymentSchema.pre(/^find/, function (next) {
   this.populate({
     path: "farmer",
-    select: "name _id profilePic paymentMethod",
   });
   next();
 });
