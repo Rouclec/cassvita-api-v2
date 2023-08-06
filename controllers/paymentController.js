@@ -78,11 +78,39 @@ exports.getAllPayments = getAll(Payment);
 exports.getPayment = getOne(Payment);
 
 exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
   const payments = await Payment.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$status",
+        total: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  const minMax = await Payment.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ],
+      },
+    },
     {
       $group: {
         _id: "",
-        totalPayment: { $sum: "$amount" },
         highestPayment: { $max: "$amount" },
         lowestPayment: { $min: "$amount" },
       },
@@ -92,7 +120,10 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
   return next(
     res.status(200).json({
       status: "OK",
-      data: payments[0],
+      data: {
+        payments,
+        ...minMax[0]
+      },
     })
   );
 });
