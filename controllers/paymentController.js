@@ -284,5 +284,27 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getPaymentsFromProcurement = catchAsync(async (req, res, next) => {
+  const procurement = await Procurement.findOne({ id: req?.params?.id })
+
+  if (!procurement) {
+    return next(
+      res.status(401).json({
+        status: 'Not found',
+        message: `No procurement with id: ${req?.params?.id}`
+      })
+    )
+  }
+
+  const payments = await Payment.find({ procurement: procurement._id })
+
+  return next(
+    res.status(200).json({
+      status: 'OK',
+      data: payments
+    })
+  )
+})
+
 exports.searchPayment = search(Payment);
 

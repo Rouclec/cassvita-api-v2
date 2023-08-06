@@ -3,6 +3,7 @@ const { protect, restrictTo } = require("../controllers/authController");
 const {
   getAllPayments,
   getPayment,
+  getPaymentsFromProcurement,
   changePaymentStatus,
   uploadReceipt,
   resizePhoto,
@@ -17,6 +18,8 @@ router.get(
   restrictTo("accountant", "admin"),
   searchPayment
 );
+
+router.get('/procurement/:id', restrictTo("accountant", "admin"), getPaymentsFromProcurement)
 
 router.get("/", restrictTo("accountant", "admin"), getAllPayments);
 router.get(
