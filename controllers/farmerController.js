@@ -134,7 +134,8 @@ const getStats = (farmers) => {
               $and: [
                 { createdAt: { $gt: firstDay } },
                 { createdAt: { $lte: lastDay } },
-                { farmer: mongoose.Types.ObjectId(farmer._id) }
+                { farmer: mongoose.Types.ObjectId(farmer._id) },
+                { status: 'Paid' }
               ],
             }
           },
