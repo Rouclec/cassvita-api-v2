@@ -232,24 +232,7 @@ exports.processXlFile = catchAsync(async (req, res, next) => {
       results: farmersCreated.length,
       data: farmersCreated,
     })
-  ); const createContributors = (contributors) => {
-    return new Promise((resolve, reject) => {
-      try {
-        let contributorsId = [];
-        contributors.forEach(async contributor => {
-          const id = await Contributor.create(contributor)
-          contributorsId.push(id._id)
-          if (contributorsId.length === contributors.length) {
-            return resolve(contributorsId);
-          }
-        })
-
-
-      } catch (error) {
-        return reject(error);
-      }
-    })
-  }
+  );
 });
 
 // exports.uploadFarmersFromExcel = catchAsync(async (req, res, next) => {
