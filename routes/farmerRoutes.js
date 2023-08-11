@@ -13,6 +13,7 @@ const {
   uploadXlFile,
   processXlFile,
   searchFarmer,
+  overView,
 } = require("../controllers/farmerController");
 const {
   stats: allFarmerStats,
@@ -26,6 +27,7 @@ router.get(
   restrictTo("accountant", "admin", "procurement-officer"),
   searchFarmer
 );
+router.get('/overview', restrictTo("accountant", "admin", "procurement-officer"), overView)
 router.get(
   "/reports/individual/:farmerId/:startDate?/:endDate?",
   restrictTo("accountant", "admin", "procurement-officer"),

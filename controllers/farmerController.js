@@ -8,6 +8,8 @@ const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
 const xlsx = require("xlsx");
+const Payment = require("../models/paymentModel");
+const { default: mongoose } = require("mongoose");
 
 const formatNumber = (number) => {
   let phone;
@@ -118,6 +120,46 @@ const fileStorage = multer.diskStorage({
   },
 });
 
+const getStats = (farmers) => {
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth() - 6, date.getDate());
+  const lastDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return new Promise((resolve, reject) => {
+    try {
+      let stats = [];
+      farmers.forEach(async (farmer) => {
+        let paymentStats = await Payment.aggregate([
+          {
+            $match: {
+              $and: [
+                { createdAt: { $gt: firstDay } },
+                { createdAt: { $lte: lastDay } },
+                { farmer: mongoose.Types.ObjectId(farmer._id) }
+              ],
+            }
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              amount: { $sum: '$amount' }
+            }
+          }
+        ])
+        const stat = {
+          farmer: farmer.name,
+          stats: paymentStats
+        }
+        stats.push(stat)
+        if (stats.length === farmers.length) {
+          return resolve(stats);
+        }
+      })
+    } catch (error) {
+      return reject(error);
+    }
+  })
+}
+
 exports.uploadXlFile = multer({
   storage: fileStorage,
 }).single("farmersData");
@@ -190,7 +232,24 @@ exports.processXlFile = catchAsync(async (req, res, next) => {
       results: farmersCreated.length,
       data: farmersCreated,
     })
-  );
+  ); const createContributors = (contributors) => {
+    return new Promise((resolve, reject) => {
+      try {
+        let contributorsId = [];
+        contributors.forEach(async contributor => {
+          const id = await Contributor.create(contributor)
+          contributorsId.push(id._id)
+          if (contributorsId.length === contributors.length) {
+            return resolve(contributorsId);
+          }
+        })
+
+
+      } catch (error) {
+        return reject(error);
+      }
+    })
+  }
 });
 
 // exports.uploadFarmersFromExcel = catchAsync(async (req, res, next) => {
@@ -360,7 +419,6 @@ exports.stats = catchAsync(async (req, res, next) => {
   active = 0;
   inactive = 0;
   const thisMonth = new Date().getMonth();
-  console.log("this month: ", thisMonth);
   const communities = await Farmer.aggregate([
     {
       $group: {
@@ -457,3 +515,14 @@ exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
 });
 
 exports.searchFarmer = search(Farmer);
+
+exports.overView = catchAsync(async (_, res, next) => {
+
+  const farmers = await Farmer.find().sort('-totalPay').limit(4);
+  let stats = await getStats(farmers);
+
+  return next(res.status(200).json({
+    status: 'OK',
+    data: stats
+  }))
+})
