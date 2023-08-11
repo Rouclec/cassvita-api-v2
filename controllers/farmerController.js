@@ -402,7 +402,9 @@ exports.stats = catchAsync(async (req, res, next) => {
     females = 0;
   active = 0;
   inactive = 0;
-  const thisMonth = new Date().getMonth();
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 1);
   const communities = await Farmer.aggregate([
     {
       $group: {
@@ -434,7 +436,12 @@ exports.stats = catchAsync(async (req, res, next) => {
 
   const newFarmers = await Farmer.aggregate([
     {
-      $match: { monthCreated: { $eq: thisMonth } },
+      $match: {
+        $and: [
+          { createdAt: { $gt: firstDay } },
+          { createdAt: { $lte: lastDay } },
+        ]
+      },
     },
     {
       $group: {
@@ -444,7 +451,7 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  const sortedFarmers = await Farmer.find().sort("-amount");
+  const sortedFarmers = await Farmer.find().sort("-totalPay");
   const highestPaid = sortedFarmers[0];
   const lowestPaid = sortedFarmers[sortedFarmers.length - 1];
 
