@@ -123,7 +123,7 @@ const fileStorage = multer.diskStorage({
 const getStats = (farmers) => {
   const date = new Date();
   const firstDay = new Date(date.getFullYear(), date.getMonth() - 6, date.getDate());
-  const lastDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const lastDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
   return new Promise((resolve, reject) => {
     try {
       let stats = [];
@@ -132,8 +132,8 @@ const getStats = (farmers) => {
           {
             $match: {
               $and: [
-                { createdAt: { $gt: firstDay } },
-                { createdAt: { $lte: lastDay } },
+                { createdAt: { $gte: firstDay } },
+                { createdAt: { $lt: lastDay } },
                 { farmer: mongoose.Types.ObjectId(farmer._id) },
                 { status: 'Paid' }
               ],
