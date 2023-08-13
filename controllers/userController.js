@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
+const { promisify } = require("util");
+const jwt = require("jsonwebtoken");
 const { getAll, getOne } = require("./helperController");
 
 exports.updateMe = catchAsync(async (req, res, next) => {
