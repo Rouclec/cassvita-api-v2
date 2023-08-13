@@ -24,12 +24,17 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.getAllUsers = getAll(User);
 exports.getUser = catchAsync(async (req, res, next) => {
   let token;
-  if (req.params.token) {
-    token = req.params.token
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies) {
+    token = req.cookies.jwt;
   } else {
     return res.status(401).json({
-      status: "Server error",
-      message: "Please provide a token",
+      status: "Unauthorized",
+      message: "Please login to access this route",
     });
   }
 
@@ -55,6 +60,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
     });
   }
 
+  //5) pass user to the the req and move on to next middleware
   return next(
     res.status(200).json({
       status: 'OK',
