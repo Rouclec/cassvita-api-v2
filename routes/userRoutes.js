@@ -1,10 +1,11 @@
 const express = require("express");
 const { protect, updatePasswword } = require("../controllers/authController");
-const { updateMe, getAllUsers } = require("../controllers/userController");
+const { updateMe, getAllUsers, getUser } = require("../controllers/userController");
 
 const router = express.Router();
 
 router.get("/", getAllUsers);
+router.get('/:id', getUser)
 
 router.use(protect);
 router.patch("/update-profile", updateMe);

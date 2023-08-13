@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
 const Procurement = require("../models/procumentModel");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const Community = require("../models/communityModel");
 
 const multerStorage = multer.memoryStorage();

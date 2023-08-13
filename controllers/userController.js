@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll } = require("./helperController");
+const { getAll, getOne } = require("./helperController");
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(
@@ -22,3 +22,4 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = getAll(User);
+exports.getUser = getOne(User)
