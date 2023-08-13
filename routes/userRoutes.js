@@ -5,7 +5,7 @@ const { updateMe, getAllUsers, getUser } = require("../controllers/userControlle
 const router = express.Router();
 
 router.get("/", getAllUsers);
-router.get('/:id', getUser)
+router.get('/get', getUser)
 
 router.use(protect);
 router.patch("/update-profile", updateMe);
