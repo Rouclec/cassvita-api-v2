@@ -15,10 +15,9 @@ const router = express.Router();
 router.use(protect);
 router.get(
   "/stats",
-  restrictTo("accountant", "admin", "procurement-officer"),
   generalStats
 );
-router.get('/overview', restrictTo('accountant', 'admin', 'procurement-officer'), overview);
+router.get('/overview', overview);
 router.get(
   "/search/:searchString",
   restrictTo("accountant", "admin", "procurement-officer"),
@@ -26,7 +25,6 @@ router.get(
 );
 router.get(
   "/reports/:startDate?/:endDate?",
-  restrictTo("accountant", "admin", "procurement-officer"),
   stats
 );
 router

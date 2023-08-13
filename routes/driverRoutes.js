@@ -12,7 +12,7 @@ const router = express.Router();
 router.use(protect);
 router
   .route("/")
-  .get(restrictTo("admin", "procurement-officer"), getAllDrivers)
+  .get(getAllDrivers)
   .post(restrictTo("admin", "procurement-officer"), createDriver);
 router
   .route("/:id")

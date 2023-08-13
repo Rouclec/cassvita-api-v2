@@ -13,17 +13,17 @@ const router = express.Router();
 router.use(protect);
 router.get(
   "/search/:searchString",
-  restrictTo("accountant", "admin", "procurement-officer"),
+  restrictTo("accountant", "admin", "procurement-officer", "manager"),
   searchCommunity
 );
 router
   .route("/")
   .get(getAllCommunities)
-  .post(restrictTo("admin", "procurement-officer"), createCommunity);
+  .post(restrictTo("admin", "procurement-officer", "manager"), createCommunity);
 
 router
   .route("/:id")
-  .patch(restrictTo("admin", "procurement-officer"), updateCommunity)
+  .patch(restrictTo("admin", "procurement-officer", "manager"), updateCommunity)
   .get(getCommunity);
 
 module.exports = router;

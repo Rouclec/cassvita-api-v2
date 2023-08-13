@@ -18,7 +18,6 @@ router.get("/reports/:startDate?/:endDate?", purchaseOrderReport);
 router
   .route("/")
   .get(
-    restrictTo("accountant","admin", "procurement-officer"),
     getAllPurchaseOrder
   )
   .post(
@@ -31,7 +30,6 @@ router
 router
   .route("/stats")
   .get(
-    restrictTo("accountant", "admin", "procurement-officer"),
     purchaseOrderStats
   );
 
@@ -51,7 +49,7 @@ router
 router
   .route("/:id/close")
   .get(
-    restrictTo("admin", "procurement-officer"),
+    restrictTo("admin", "procurement-officer", "manager"),
     closePurchaseOrder
   );
 

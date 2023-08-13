@@ -21,17 +21,16 @@ router.get(
 
 router.get('/procurement/:id', restrictTo("accountant", "admin"), getPaymentsFromProcurement)
 
-router.get("/", restrictTo("accountant", "admin"), getAllPayments);
+router.get("/", getAllPayments);
 router.get(
   "/stats",
-  restrictTo("accountant", "admin"),
   getGeneralPaymentStats
 );
 
-router.get("/:id", restrictTo("accountant", "admin"), getPayment);
+router.get("/:id", restrictTo("accountant", "admin","manager"), getPayment);
 router.patch(
   "/:id/:status",
-  restrictTo("accountant", "admin"),
+  restrictTo("accountant", "admin","manager"),
   uploadReceipt,
   resizePhoto,
   changePaymentStatus

@@ -24,31 +24,29 @@ const router = express.Router();
 router.use(protect);
 router.get(
   "/search/:searchString",
-  restrictTo("accountant", "admin", "procurement-officer"),
+  restrictTo("accountant", "admin", "procurement-officer", "manager"),
   searchFarmer
 );
-router.get('/overview', restrictTo("accountant", "admin", "procurement-officer"), overView)
+router.get('/overview', overView)
 router.get(
   "/reports/individual/:farmerId/:startDate?/:endDate?",
-  restrictTo("accountant", "admin", "procurement-officer"),
   farmerStats
 );
 router.get(
   "/reports/:startDate?/:endDate?/:community?",
-  restrictTo("accountant", "admin", "procurement-officer"),
   allFarmerStats
 );
 router.post(
   "/upload-from-file",
-  restrictTo("accountant", "admin", "procurement-officer"),
+  restrictTo("accountant", "admin", "procurement-officer", "manager"),
   uploadXlFile,
   processXlFile
 );
 router
   .route("/")
-  .get(restrictTo("accountant", "admin", "procurement-officer"), getAllFarmers)
+  .get(restrictTo("accountant", "admin", "procurement-officer", "manager"), getAllFarmers)
   .post(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
     uploadProfilePic,
     resizePhoto,
     createFarmer
@@ -56,25 +54,24 @@ router
 router
   .route("/:id/remove-from-community")
   .get(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
     removeFromCommunity
   );
 router
   .route("/community/:communityId")
   .get(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
     getAllFarmersFromCommunity
   );
 router.get(
   "/stats",
-  restrictTo("accountant", "admin", "procurement-officer"),
   stats
 );
 router
   .route("/:id")
-  .get(restrictTo("accountant", "admin", "procurement-officer"), getFarmer)
+  .get(restrictTo("accountant", "admin", "procurement-officer", "manager"), getFarmer)
   .patch(
-    restrictTo("accountant", "admin", "procurement-officer"),
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
     uploadProfilePic,
     resizePhoto,
     updateFarmer
