@@ -388,7 +388,7 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
     {
       $group: {
-        _id: { day: { $dayOfWeek: "$createdAt" } },
+        _id: {$dayOfWeek: "$createdAt" },
         totalAmount: { $sum: "$totalAmount" },
         totalKg: { $sum: "$totalWeight" },
         totalBags: { $sum: "$totalBags" },
