@@ -75,7 +75,7 @@ userSchema.plugin(uniqueValidator, {
 userSchema.pre(/^find/, function (next) {
   this.populate({
     path: "role",
-    select: "code -_id",
+    select: "code name -_id",
   });
   next();
 });
