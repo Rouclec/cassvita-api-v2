@@ -67,6 +67,10 @@ const farmerSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    removed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },

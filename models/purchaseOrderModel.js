@@ -34,6 +34,10 @@ const purchaseOrderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    removed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },

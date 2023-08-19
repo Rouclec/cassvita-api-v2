@@ -56,6 +56,10 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "PurchaseOrder",
     },
+    removed: {
+      type: Boolean,
+      default: false,
+    },
     updatedOn: Date,
     receipt: String,
   },

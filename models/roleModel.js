@@ -11,6 +11,10 @@ const roleSchema = new mongoose.Schema({
   code: {
     type: String,
   },
+  removed: {
+    type: Boolean,
+    default: false,
+  },
   createdBy: {
     type: mongoose.Schema.ObjectId,
     ref: "User",

@@ -34,6 +34,10 @@ const communitySchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "User",
   },
+  removed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 communitySchema.plugin(uniqueValidator, {
