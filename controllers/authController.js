@@ -96,7 +96,7 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
-  let user = await User.findOne({ email }).select("+password");
+  let user = await User.findOne({ email, removed: { $ne: true } }).select("+password");
   if (!(user && (await user.comparePassword(password)))) {
     // check if user exists, and password is correct
     return next(
@@ -142,7 +142,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     });
   }
   //4) check if user exists
-  const user = await User.findById(verifiedToken.id);
+  const user = await findById(verifiedToken.id);
   if (!user) {
     return res.status(401).json({
       status: "Unauthorized",
@@ -173,7 +173,7 @@ exports.restrictTo = (...roles) => {
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   //1) get the user by email
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email, removed: { $ne: true } });
   if (!user) {
     return next(
       res.status(404).json({
@@ -220,6 +220,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .digest("hex");
   const user = await User.findOne({
     resetToken: hashedToken,
+    removed: {$ne: true},
     resetTokenExpiration: { $gt: Date.now() },
   }).select("+password");
 
