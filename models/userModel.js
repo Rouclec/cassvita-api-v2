@@ -55,6 +55,11 @@ const userSchema = new mongoose.Schema(
     },
     resetToken: String,
     resetTokenExpiration: Date,
+    country: String,
+    city: String,
+    state: String,
+    postalCode: String,
+    taxID: String
   },
   {
     toJSON: { virtuals: true },

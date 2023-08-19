@@ -2,26 +2,9 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
-const { getAll, getOne } = require("./helperController");
+const { getAll, updateOne } = require("./helperController");
 
-exports.updateMe = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(
-    req.user.id,
-    {
-      email: req.body.email,
-      fullName: req.body.fullName,
-      phoneNumber: req.body.phoneNumber,
-    },
-    { new: true, runValidators: true }
-  );
-
-  next(
-    res.status(200).json({
-      status: "OK",
-      data: user,
-    })
-  );
-});
+exports.updateMe = updateOne(User, ['fullName', 'email', 'phoneNumber', 'country', 'city', 'state', 'postalCode', 'taxID'])
 
 exports.getAllUsers = getAll(User);
 exports.getUser = catchAsync(async (req, res, next) => {
