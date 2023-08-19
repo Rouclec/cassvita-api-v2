@@ -142,7 +142,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     });
   }
   //4) check if user exists
-  const user = await findById(verifiedToken.id);
+  const user = await User.findById(verifiedToken.id);
   if (!user) {
     return res.status(401).json({
       status: "Unauthorized",
