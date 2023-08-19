@@ -76,7 +76,7 @@ exports.getOne = (Model, populateOptions, selectOptions) =>
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const features = new APIFeatures(Model.find(), req.query)
+    const features = new APIFeatures(Model.find({ removed: { $ne: true } }), req.query)
       .filter()
       .sort("-createdAt")
       .limitFields()
