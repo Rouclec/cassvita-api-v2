@@ -29,6 +29,24 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = getAll(User);
+exports.removeUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id)
+
+  if (!user) {
+    return next(res.status(404).json({
+      status: 'Not found',
+      message: "No such user"
+    }))
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(user?._id, { removed: true })
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: updatedUser
+    })
+  )
+})
 exports.getUser = catchAsync(async (req, res, next) => {
   let token;
   if (
