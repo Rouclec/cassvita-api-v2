@@ -511,7 +511,7 @@ exports.overView = catchAsync(async (_, res, next) => {
 
   let stats = []
   const farmers = await Farmer.find().sort('-totalPay').limit(4);
-  if (farmers.length > 1) stats = await getStats(farmers);
+  if (farmers.length > 0) stats = await getStats(farmers);
 
   return next(res.status(200).json({
     status: 'OK',
