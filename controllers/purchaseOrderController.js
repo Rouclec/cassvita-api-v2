@@ -103,8 +103,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   const purchaseOrder = await PurchaseOrder.create({
     id,
     quantity: quantity * 1,
-    amount: quantity * 1 * (unitPrice * 1),
-    unitPrice: unitPrice * 1,
+    amount: quantity * 1,
     startDate,
     endDate,
     bdc: bdc,

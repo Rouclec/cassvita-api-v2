@@ -15,10 +15,6 @@ const purchaseOrderSchema = new mongoose.Schema(
       enum: ["open", "closed", "draft"],
       default: "open",
     },
-    unitPrice: {
-      type: Number,
-      required: [true, "Please provide a unit price for this P.O."],
-    },
     startDate: Date,
     endDate: Date,
     bdc: String,
