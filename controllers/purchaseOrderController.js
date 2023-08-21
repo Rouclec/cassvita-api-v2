@@ -77,7 +77,7 @@ exports.getPurchaseOrder = getOne(PurchaseOrder);
 
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   let bdc;
-  const { quantity, amount, startDate, endDate, unitPrice } = req.body;
+  const { quantity, amount, startDate, endDate } = req.body;
 
   const date = new Date().toDateString().split(" ");
 
@@ -103,7 +103,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   const purchaseOrder = await PurchaseOrder.create({
     id,
     quantity: quantity * 1,
-    amount: quantity * 1,
+    amount: amount * 1,
     startDate,
     endDate,
     bdc: bdc,
