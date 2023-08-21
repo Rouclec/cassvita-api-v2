@@ -63,9 +63,9 @@ exports.createProcurement = catchAsync(async (req, res, next) => {
     driver,
     purchaseOrder: purchaseOrderId._id,
     totalWeight,
-    totalAmount: totalWeight * purchaseOrderId.unitPrice * 1,
+    totalAmount: totalWeight * pricePerKilo * 1,
     farmLocation,
-    pricePerKilo: purchaseOrderId.unitPrice * 1,
+    pricePerKilo: pricePerKilo * 1,
     community,
     date,
     id,
@@ -369,7 +369,7 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
     {
       $group: {
-        _id: {  $month: "$createdAt" },
+        _id: { $month: "$createdAt" },
         totalAmount: { $sum: "$totalAmount" },
         totalKg: { $sum: "$totalWeight" },
         totalBags: { $sum: "$totalBags" },
@@ -388,7 +388,7 @@ exports.stats = catchAsync(async (req, res, next) => {
     },
     {
       $group: {
-        _id: {$dayOfWeek: "$createdAt" },
+        _id: { $dayOfWeek: "$createdAt" },
         totalAmount: { $sum: "$totalAmount" },
         totalKg: { $sum: "$totalWeight" },
         totalBags: { $sum: "$totalBags" },
