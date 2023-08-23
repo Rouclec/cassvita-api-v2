@@ -15,7 +15,16 @@ module.exports = (fxn) => {
             message: err.message,
           })
         );
-      } else {
+      }
+      else if (err.name === "TokenExpiredError") {
+        return next(
+          res.status(401).json({
+            status: "Token expired",
+            message: err.message,
+          })
+        );
+      }
+      else {
         next(err);
       }
     });

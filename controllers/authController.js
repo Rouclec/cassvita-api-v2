@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const Email = require("../utils/email");
 const crypto = require("crypto");
-const { createOne } = require("./helperController");
 const Role = require("../models/roleModel");
 const slugify = require("slugify");
 
@@ -220,7 +219,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .digest("hex");
   const user = await User.findOne({
     resetToken: hashedToken,
-    removed: {$ne: true},
+    removed: { $ne: true },
     resetTokenExpiration: { $gt: Date.now() },
   }).select("+password");
 
