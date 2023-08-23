@@ -303,3 +303,17 @@ exports.updatePasswword = catchAsync(async (req, res, next) => {
   // 4) Log user in
   createAuthToken(user, 200, res);
 });
+
+
+exports.refreshToken = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.body?.userId);
+  if (!user) {
+    return next(
+      res.status(500).json({
+        status: "Something went Wrong!",
+        message: "Invalid Token",
+      })
+    );
+  }
+  return createAuthToken(user, 200, res)
+})
