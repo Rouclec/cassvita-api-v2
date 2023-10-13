@@ -64,7 +64,11 @@ purchaseOrderSchema.post(/^find/, function (docs) {
   if (docs && docs.length) {
     docs.forEach(async (doc) => {
       if (doc.endDate < today && doc.status === "open") {
-        await PurchaseOrder.findByIdAndUpdate(doc._id, { status: "closed" });
+        await PurchaseOrder.findByIdAndUpdate(
+          doc._id,
+          { status: "closed" },
+          { new: true }
+        );
       }
     });
   }
