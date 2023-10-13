@@ -3,6 +3,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
 const aws = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
 
 const { getAll, getOne } = require("./helperController");
 const catchAsync = require("../utils/catchAsync");
@@ -81,9 +82,9 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
   const date = new Date().toDateString().split(" ");
 
-  const id = `PO-${date[1]}-${date[3].slice(-2)}`;
+  const id = `PO-${date[1]}-${date[3].slice(-2)}-${uuidv4().slice(0, 5)}`;
 
-  const existingPo = await PurchaseOrder.find({ id: id });
+  const existingPo = await PurchaseOrder.find({ status: 'open' });
 
   if (existingPo.length > 0) {
     return next(

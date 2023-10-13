@@ -51,15 +51,7 @@ purchaseOrderSchema.virtual("months").get(function () {
     (value, index) => this.startDate.getMonth() + index
   );
 });
-purchaseOrderSchema.pre("save", async function (next) {
-  const activePOs = await PurchaseOrder.find({ status: "open" });
-  if (activePOs) {
-    activePOs.forEach(async (po) => {
-      await PurchaseOrder.findByIdAndUpdate(po._id, { status: "closed" });
-    });
-  }
-  next();
-});
+
 purchaseOrderSchema.pre(/^find/, async function (next) {
   this.populate({
     path: "createdBy",
@@ -71,7 +63,7 @@ purchaseOrderSchema.post(/^find/, function (docs) {
   const today = new Date(Date.now());
   if (docs && docs.length) {
     docs.forEach(async (doc) => {
-      if (doc.endDate < today && doc.status === 'open') {
+      if (doc.endDate < today && doc.status === "open") {
         await PurchaseOrder.findByIdAndUpdate(doc._id, { status: "closed" });
       }
     });

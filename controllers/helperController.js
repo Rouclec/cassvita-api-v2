@@ -42,7 +42,7 @@ exports.createOne = (Model, params) =>
       createdBy: req.user._id,
     };
     params.forEach((param) => (body[param] = req.body[param]));
-    const newDoc = await Model.create(req.body);
+    const newDoc = await Model.create(body);
 
     res.status(201).json({
       status: "OK",
