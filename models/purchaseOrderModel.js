@@ -30,6 +30,10 @@ const purchaseOrderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    recent: {
+      type: Boolean,
+      default: true,
+    },
     removed: {
       type: Boolean,
       default: false,
@@ -59,6 +63,12 @@ purchaseOrderSchema.pre(/^find/, async function (next) {
   });
   next();
 });
+
+purchaseOrderSchema.pre(/^find/, async function (next) {
+  const recents = await PurchaseOrder.findOne({ recent: true });
+  console.log({ recents });
+  next();
+});
 purchaseOrderSchema.post(/^find/, function (docs) {
   const today = new Date(Date.now());
   if (docs && docs.length) {
@@ -73,5 +83,19 @@ purchaseOrderSchema.post(/^find/, function (docs) {
     });
   }
 });
+
+purchaseOrderSchema.post("save", async function () {
+  const recents = await PurchaseOrder.findONe({ recent: true });
+  if (recents.length > 0) {
+    recents.forEach(async (recent) => {
+      await PurchaseOrder.findByIdAndUpdate(
+        recent._id,
+        { recent: false },
+        { new: true }
+      );
+    });
+  }
+});
+
 const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
 module.exports = PurchaseOrder;
