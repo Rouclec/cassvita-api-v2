@@ -9,10 +9,6 @@ const purchaseOrderSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Please enter the size for this purchase order"],
     },
-    purchased: {
-      type: Number,
-      default: 0,
-    },
     amount: Number,
     status: {
       type: String,
