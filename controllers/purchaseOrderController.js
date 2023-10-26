@@ -96,11 +96,11 @@ exports.getIncompletePO = catchAsync(async (req, res, next) => {
   ]);
 
   if (procurements[0]?.totalAmount)
-    leftOver = latestPO.quantity - procurements[0].totalWeight;
+    leftOver = latestPO?.quantity || 0 - procurements[0].totalWeight;
 
   const leftOverPO = {
-    id: latestPO._id,
-    quantity: latestPO.quantity,
+    id: latestPO?._id,
+    quantity: latestPO?.quantity,
     totalPurchased: procurements[0]?.totalWeight || 0,
     leftOver,
   };
