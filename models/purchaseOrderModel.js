@@ -80,10 +80,10 @@ purchaseOrderSchema.post(/^find/, function (docs) {
   }
 });
 
-purchaseOrderSchema.post("save", async function () {
+purchaseOrderSchema.post("save", async function (doc) {
   const recent = await PurchaseOrder.findOne({ recent: true });
 
-  if (!!recent) {
+  if (!!recent && recent.id !== doc?.id) {
     await PurchaseOrder.findByIdAndUpdate(
       recent._id,
       { recent: false },
