@@ -10,6 +10,7 @@ const {
   purchaseOrderStats,
   uploadBdc,
   purchaseOrderReport,
+  getIncompletePO,
 } = require("../controllers/purchaseOrderController");
 const router = express.Router();
 
@@ -17,9 +18,7 @@ router.use(protect);
 router.get("/reports/:startDate?/:endDate?", purchaseOrderReport);
 router
   .route("/")
-  .get(
-    getAllPurchaseOrder
-  )
+  .get(getAllPurchaseOrder)
   .post(
     restrictTo("admin", "procurement-officer"),
     uploadBdc,
@@ -27,11 +26,9 @@ router
     createPurchaseOrder
   );
 
-router
-  .route("/stats")
-  .get(
-    purchaseOrderStats
-  );
+router.route("/stats").get(purchaseOrderStats);
+
+router.route("/incomplete").get(getIncompletePO);
 
 router
   .route("/:id")

@@ -76,6 +76,43 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
 exports.getAllPurchaseOrder = getAll(PurchaseOrder);
 exports.getPurchaseOrder = getOne(PurchaseOrder);
 
+exports.getIncompletePO = catchAsync(async (req, res, next) => {
+  const latestPO = await PurchaseOrder.findOne({ recent: true });
+  const poObjectId = mongoose.Types.ObjectId(latestPO?._id);
+
+  let leftOver = 0;
+
+  const procurements = await Procurement.aggregate([
+    {
+      $match: { purchaseOrder: { $eq: poObjectId } },
+    },
+    {
+      $group: {
+        _id: "",
+        totalAmount: { $sum: "$totalAmount" },
+        totalWeight: { $sum: "$totalWeight" },
+      },
+    },
+  ]);
+
+  if (procurements[0].totalAmount)
+    leftOver = latestPO.quantity - procurements[0].totalWeight;
+
+  const leftOverPO = {
+    id: latestPO._id,
+    quantity: latestPO.quantity,
+    totalPurchased: procurements[0].totalWeight,
+    leftOver,
+  };
+
+  next(
+    res.status(200).json({
+      status: "OK",
+      data: leftOverPO,
+    })
+  );
+});
+
 exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
   let bdc;
   const { quantity, amount, startDate, endDate } = req.body;
@@ -84,7 +121,7 @@ exports.createPurchaseOrder = catchAsync(async (req, res, next) => {
 
   const id = `PO-${date[1]}-${date[3].slice(-2)}-${uuidv4().slice(0, 5)}`;
 
-  const existingPo = await PurchaseOrder.find({ status: 'open' });
+  const existingPo = await PurchaseOrder.find({ status: "open" });
 
   if (existingPo.length > 0) {
     return next(
