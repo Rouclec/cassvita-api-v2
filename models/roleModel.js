@@ -2,24 +2,29 @@ const mongoose = require("mongoose");
 const slugify = require("slugify");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const roleSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please provide a name for this role"],
-    unique: true,
+const roleSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please provide a name for this role"],
+      unique: true,
+    },
+    code: {
+      type: String,
+    },
+    removed: {
+      type: Boolean,
+      default: false,
+    },
+    createdBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
   },
-  code: {
-    type: String,
-  },
-  removed: {
-    type: Boolean,
-    default: false,
-  },
-  createdBy: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 roleSchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",

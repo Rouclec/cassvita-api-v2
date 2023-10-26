@@ -7,7 +7,7 @@ const procurementSchema = new mongoose.Schema(
   {
     id: {
       type: String,
-      unique: true
+      unique: true,
     },
     purchaseOrder: {
       type: mongoose.Schema.ObjectId,
@@ -15,10 +15,6 @@ const procurementSchema = new mongoose.Schema(
     },
     community: String,
     driver: String,
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
     date: Date,
     farmLocation: {
       type: String,
@@ -53,6 +49,7 @@ const procurementSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
@@ -117,7 +114,8 @@ procurementSchema.pre(/^find/, function (next) {
     .populate({
       path: "community",
     })
-    .populate("payments").populate('purchaseOrder');
+    .populate("payments")
+    .populate("purchaseOrder");
   next();
 });
 

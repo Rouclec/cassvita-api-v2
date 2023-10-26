@@ -63,9 +63,10 @@ const userSchema = new mongoose.Schema(
     city: String,
     state: String,
     postalCode: String,
-    taxID: String
+    taxID: String,
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }

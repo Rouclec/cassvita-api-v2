@@ -2,43 +2,51 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const communitySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please provide the name of this community"],
-    unique: true,
-  },
-  location: {
-    type: String,
-    required: [true, "Enter the location of this community"],
-  },
-  cassavaSpecies: {
-    type: String,
-  },
-  communityHead: {
+const communitySchema = new mongoose.Schema(
+  {
     name: {
       type: String,
-      required: [true, "Enter the name of the community head"],
+      required: [true, "Please provide the name of this community"],
+      unique: true,
     },
-    phoneNumber: {
+    location: {
       type: String,
-      validate: [validator.isMobilePhone, "Please enter a valid phone number"],
+      required: [true, "Enter the location of this community"],
+    },
+    cassavaSpecies: {
+      type: String,
+    },
+    communityHead: {
+      name: {
+        type: String,
+        required: [true, "Enter the name of the community head"],
+      },
+      phoneNumber: {
+        type: String,
+        validate: [
+          validator.isMobilePhone,
+          "Please enter a valid phone number",
+        ],
+      },
+    },
+    numberOfFarmers: {
+      type: Number,
+      default: 0,
+    },
+    unitPrice: Number,
+    createdBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
+    removed: {
+      type: Boolean,
+      default: false,
     },
   },
-  numberOfFarmers: {
-    type: Number,
-    default: 0,
-  },
-  unitPrice: Number,
-  createdBy: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-  },
-  removed: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 communitySchema.plugin(uniqueValidator, {
   message: "{PATH} {VALUE} already in use, please try another!",

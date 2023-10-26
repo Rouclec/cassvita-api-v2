@@ -54,10 +54,6 @@ const farmerSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
     preferedPaymentMethod: String,
     monthCreated: {
       type: Date,
@@ -73,6 +69,7 @@ const farmerSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }

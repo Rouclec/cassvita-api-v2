@@ -40,10 +40,6 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
     month: {
       type: String,
       default: `${new Date().getMonth()}:${new Date().getFullYear()}`,
@@ -64,6 +60,7 @@ const paymentSchema = new mongoose.Schema(
     receipt: String,
   },
   {
+    timestamps: true,
     toObject: { virtuals: true },
     toJSON: { virtuals: true },
   }
