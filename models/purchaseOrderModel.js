@@ -65,20 +65,20 @@ purchaseOrderSchema.pre(/^find/, async function (next) {
   next();
 });
 
-purchaseOrderSchema.post(/^find/, function (docs) {
-  const today = new Date(Date.now());
-  if (docs && docs.length) {
-    docs.forEach(async (doc) => {
-      if (doc.endDate < today && doc.status === "open") {
-        await PurchaseOrder.findByIdAndUpdate(
-          doc._id,
-          { status: "closed" },
-          { new: true }
-        );
-      }
-    });
-  }
-});
+// purchaseOrderSchema.post(/^find/, function (docs) {
+//   const today = new Date(Date.now());
+//   if (docs && docs.length) {
+//     docs.forEach(async (doc) => {
+//       if (doc.endDate < today && doc.status === "open") {
+//         await PurchaseOrder.findByIdAndUpdate(
+//           doc._id,
+//           { status: "closed" },
+//           { new: true }
+//         );
+//       }
+//     });
+//   }
+// });
 
 purchaseOrderSchema.post("save", async function (doc) {
   const recent = await PurchaseOrder.findOne({ recent: true });
