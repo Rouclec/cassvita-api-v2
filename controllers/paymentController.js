@@ -95,7 +95,7 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
       $group: {
         _id: "$status",
         amount: { $sum: "$amount" },
-        total: { $sum: 1 }
+        total: { $sum: 1 },
       },
     },
   ]);
@@ -123,7 +123,7 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
       status: "OK",
       data: {
         payments,
-        ...minMax[0]
+        ...minMax[0],
       },
     })
   );
@@ -285,27 +285,41 @@ exports.farmerStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getPaymentsFromProcurement = catchAsync(async (req, res, next) => {
-  const procurement = await Procurement.findOne({ id: req?.params?.id })
+  const procurement = await Procurement.findOne({ id: req?.params?.id });
 
   if (!procurement) {
     return next(
       res.status(401).json({
-        status: 'Not found',
-        message: `No procurement with id: ${req?.params?.id}`
+        status: "Not found",
+        message: `No procurement with id: ${req?.params?.id}`,
       })
-    )
+    );
   }
 
-  const payments = await Payment.find({ procurement: procurement._id })
+  const payments = await Payment.find({ procurement: procurement._id });
 
   return next(
     res.status(200).json({
-      status: 'OK',
+      status: "OK",
       results: payments.length,
-      data: payments
+      data: payments,
     })
-  )
-})
+  );
+});
 
 exports.searchPayment = search(Payment);
 
+exports.validateAllPayment = catchAsync(async (req, res, next) => {
+  const pendingPayments = await Payment.find({ status: "Pending" });
+
+  pendingPayments.forEach(async (payment) => {
+    await Payment.findByIdAndUpdate(payment._id, { status: "Paid" });
+  });
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: pendingPayments,
+    })
+  );
+});
