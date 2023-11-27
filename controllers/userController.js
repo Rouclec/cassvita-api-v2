@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const { getAll, getOne } = require("./helperController");
+const APIFeatures = require("../utils/apiFeatures");
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(
@@ -28,7 +29,42 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   );
 });
 
-exports.getAllUsers = getAll(User);
+exports.getAllUsers = catchAsync(async (req, res) => {
+  let Model = User;
+  const features = new APIFeatures(Model.find({ removed: { $ne: true } }), req.query)
+    .filter()
+    .sort("-createdAt")
+    .limitFields()
+    .paginate();
+
+  let docs = await features.query;
+  let pageQuery = features.queryString.page;
+  let limitQuery = features.queryString.limit;
+  let newQueryString = features.queryString;
+  delete newQueryString.sort;
+  delete newQueryString.page;
+  delete newQueryString.limit;
+  newQueryString = {
+    ...newQueryString,
+    removed: { $ne: true }
+  }
+  const count = await Model.count(newQueryString) - 1;
+  let page = "1 of 1";
+  if (pageQuery && limitQuery) {
+    const pages = Math.ceil(count / limitQuery);
+    page = `${pageQuery} of ${pages}`;
+  }
+
+  docs = docs.filter(doc => doc.id !== req.user.id)
+
+  res.status(200).json({
+    status: "OK",
+    results: count,
+    page: page,
+    data: docs,
+  });
+});
+
 exports.removeUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id)
 
