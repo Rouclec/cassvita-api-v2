@@ -89,6 +89,10 @@ exports.getAll = (Model) =>
     delete newQueryString.sort;
     delete newQueryString.page;
     delete newQueryString.limit;
+    newQueryString = {
+      ...newQueryString,
+      removed: { $ne: true }
+    }
     const count = await Model.count(newQueryString);
     let page = "1 of 1";
     if (pageQuery && limitQuery) {

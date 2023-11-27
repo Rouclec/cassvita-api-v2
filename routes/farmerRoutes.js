@@ -1,4 +1,5 @@
 const express = require("express");
+
 const { protect, restrictTo } = require("../controllers/authController");
 const {
   getAllFarmers,
@@ -14,6 +15,7 @@ const {
   processXlFile,
   searchFarmer,
   overView,
+  payAllFarmers,
 } = require("../controllers/farmerController");
 const {
   stats: allFarmerStats,
@@ -22,20 +24,17 @@ const {
 const router = express.Router();
 
 router.use(protect);
+
+router.get("/pay-all-farmers", restrictTo("admin"), payAllFarmers);
+
 router.get(
   "/search/:searchString",
   restrictTo("accountant", "admin", "procurement-officer", "manager"),
   searchFarmer
 );
-router.get('/overview', overView)
-router.get(
-  "/reports/individual/:farmerId/:startDate?/:endDate?",
-  farmerStats
-);
-router.get(
-  "/reports/:startDate?/:endDate?/:community?",
-  allFarmerStats
-);
+router.get("/overview", overView);
+router.get("/reports/individual/:farmerId/:startDate?/:endDate?", farmerStats);
+router.get("/reports/:startDate?/:endDate?/:community?", allFarmerStats);
 router.post(
   "/upload-from-file",
   restrictTo("accountant", "admin", "procurement-officer", "manager"),
@@ -44,7 +43,10 @@ router.post(
 );
 router
   .route("/")
-  .get(restrictTo("accountant", "admin", "procurement-officer", "manager"), getAllFarmers)
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
+    getAllFarmers
+  )
   .post(
     restrictTo("accountant", "admin", "procurement-officer", "manager"),
     uploadProfilePic,
@@ -63,13 +65,13 @@ router
     restrictTo("accountant", "admin", "procurement-officer", "manager"),
     getAllFarmersFromCommunity
   );
-router.get(
-  "/stats",
-  stats
-);
+router.get("/stats", stats);
 router
   .route("/:id")
-  .get(restrictTo("accountant", "admin", "procurement-officer", "manager"), getFarmer)
+  .get(
+    restrictTo("accountant", "admin", "procurement-officer", "manager"),
+    getFarmer
+  )
   .patch(
     restrictTo("accountant", "admin", "procurement-officer", "manager"),
     uploadProfilePic,

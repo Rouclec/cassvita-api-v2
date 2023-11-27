@@ -122,8 +122,16 @@ const fileStorage = multer.diskStorage({
 
 const getStats = (farmers) => {
   const date = new Date();
-  const firstDay = new Date(date.getFullYear(), date.getMonth() - 6, date.getDate());
-  const lastDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+  const firstDay = new Date(
+    date.getFullYear(),
+    date.getMonth() - 6,
+    date.getDate()
+  );
+  const lastDay = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + 1
+  );
   return new Promise((resolve, reject) => {
     try {
       let stats = [];
@@ -135,31 +143,31 @@ const getStats = (farmers) => {
                 { createdAt: { $gte: firstDay } },
                 { createdAt: { $lt: lastDay } },
                 { farmer: mongoose.Types.ObjectId(farmer._id) },
-                { status: 'Paid' }
+                { status: "Paid" },
               ],
-            }
+            },
           },
           {
             $group: {
-              _id: { $month: '$createdAt' },
-              amount: { $sum: '$amount' }
-            }
-          }
-        ])
+              _id: { $month: "$createdAt" },
+              amount: { $sum: "$amount" },
+            },
+          },
+        ]);
         const stat = {
           farmer: farmer.name,
-          stats: paymentStats
-        }
-        stats.push(stat)
+          stats: paymentStats,
+        };
+        stats.push(stat);
         if (stats.length === farmers.length) {
           return resolve(stats);
         }
-      })
+      });
     } catch (error) {
       return reject(error);
     }
-  })
-}
+  });
+};
 
 exports.uploadXlFile = multer({
   storage: fileStorage,
@@ -440,7 +448,7 @@ exports.stats = catchAsync(async (req, res, next) => {
         $and: [
           { createdAt: { $gt: firstDay } },
           { createdAt: { $lte: lastDay } },
-        ]
+        ],
       },
     },
     {
@@ -508,13 +516,37 @@ exports.getAllFarmersFromCommunity = catchAsync(async (req, res, next) => {
 exports.searchFarmer = search(Farmer);
 
 exports.overView = catchAsync(async (_, res, next) => {
-
-  let stats = []
-  const farmers = await Farmer.find().sort('-totalPay').limit(4);
+  let stats = [];
+  const farmers = await Farmer.find().sort("-totalPay").limit(4);
   if (farmers.length > 0) stats = await getStats(farmers);
 
-  return next(res.status(200).json({
-    status: 'OK',
-    data: stats
-  }))
-})
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: stats,
+    })
+  );
+});
+
+//Technical script
+
+exports.payAllFarmers = catchAsync(async (req, res, next) => {
+  const farmers = await Farmer.find();
+
+  farmers.forEach(async (farmer) => {
+    const { amountOwed } = farmer;
+    await Farmer.findByIdAndUpdate(
+      farmer?._id,
+      {
+        $inc: { totalPay: amountOwed },
+        $set: { amountOwed: 0 },
+      },
+      { new: true }
+    );
+  });
+
+  return res.status(200).json({
+    status: "OK",
+    data: farmers,
+  });
+});
