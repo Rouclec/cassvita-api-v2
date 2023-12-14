@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const Farmer = require("../models/farmerModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
+const User = require("../models/userModel");
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -76,7 +77,10 @@ exports.getOne = (Model, populateOptions, selectOptions) =>
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
-    const features = new APIFeatures(Model.find({ removed: { $ne: true } }), req.query)
+    const features = new APIFeatures(
+      Model.find({ removed: { $ne: true } }),
+      req.query
+    )
       .filter()
       .sort("-createdAt")
       .limitFields()
@@ -91,8 +95,8 @@ exports.getAll = (Model) =>
     delete newQueryString.limit;
     newQueryString = {
       ...newQueryString,
-      removed: { $ne: true }
-    }
+      removed: { $ne: true },
+    };
     const count = await Model.count(newQueryString);
     let page = "1 of 1";
     if (pageQuery && limitQuery) {
@@ -167,6 +171,157 @@ exports.search = (Model) =>
         results: count,
         page: page,
         data: docs,
+      })
+    );
+  });
+
+exports.genericSearch = () =>
+  catchAsync(async (req, res, next) => {
+    const { query } = req.params;
+    const regex = new RegExp(query, "i"); // Case-insensitive regex
+
+    const models = mongoose.modelNames();
+
+    let searchResults = [];
+
+    if (req.params?.model) {
+      const modelName = models.find(
+        (model) => model.toLowerCase() === req.params.model
+      );
+      const Model = mongoose.model(modelName);
+
+      let fields = Object.keys(Model.schema.paths).filter(
+        (field) =>
+          field.toString() !== "__v" &&
+          field.toString() !== "_id" &&
+          !field.toLowerCase().includes("created") &&
+          !field.toLowerCase().includes("date") &&
+          !field.toLowerCase().includes("number") &&
+          !field.toLowerCase().includes("total") &&
+          !field.toLowerCase().includes("amount") &&
+          !field.toLowerCase().includes("price") &&
+          !field.toLowerCase().includes("weight") &&
+          !field.toLowerCase().includes("bag") &&
+          !field.toLowerCase().includes("updated") &&
+          !field.toLowerCase().includes("taxid") &&
+          !field.toLowerCase().includes("postalcode") &&
+          !field.toLowerCase().includes("gender") &&
+          !field.toLowerCase().includes("farmsize") &&
+          !field.toLowerCase().includes("averageinvestment") &&
+          !field.toLowerCase().includes("profilePic") &&
+          !field.toLowerCase().includes("bdc") &&
+          !field.toLowerCase().includes("active") &&
+          !field.toLowerCase().includes("quantity") &&
+          !field.toLowerCase().includes("receipt") &&
+          !field.toLowerCase().includes("recent") &&
+          !field.toLowerCase().includes("role") &&
+          field.toString() !== "lastLogin" &&
+          field.toString() !== "resetToken" &&
+          field.toString() !== "resetTokenExpiration" &&
+          !field.toLowerCase().includes("password") &&
+          field.toString() !== "removed"
+      );
+
+      if (modelName.toLowerCase() === "farmer") {
+        fields = fields.filter((field) => field.toLowerCase() !== "community");
+      }
+      if (modelName.toLowerCase() === "procurement") {
+        fields = fields.filter(
+          (field) => field.toLowerCase() !== "purchaseorder"
+        );
+      }
+      if (modelName.toLowerCase() === "payment") {
+        fields = fields.filter(
+          (field) =>
+            field.toLowerCase() !== "purchaseorder" &&
+            field.toLowerCase() !== "procurement" &&
+            field.toLowerCase() !== "farmer"
+        );
+      }
+      if (modelName.toLowerCase() === "farmer") {
+        fields = fields.filter((field) => field.toLowerCase() !== "community");
+      }
+
+      const conditions = fields.map((field) => ({
+        [field]: regex,
+      }));
+
+      const result = await Model.find({ $or: conditions }).exec();
+      searchResults.push(...result);
+    } else {
+      for (const modelName of models) {
+        const Model = mongoose.model(modelName);
+
+        let fields = Object.keys(Model.schema.paths).filter(
+          (field) =>
+            field.toString() !== "__v" &&
+            field.toString() !== "_id" &&
+            !field.toLowerCase().includes("created") &&
+            !field.toLowerCase().includes("date") &&
+            !field.toLowerCase().includes("number") &&
+            !field.toLowerCase().includes("total") &&
+            !field.toLowerCase().includes("amount") &&
+            !field.toLowerCase().includes("price") &&
+            !field.toLowerCase().includes("weight") &&
+            !field.toLowerCase().includes("bag") &&
+            !field.toLowerCase().includes("updated") &&
+            !field.toLowerCase().includes("taxid") &&
+            !field.toLowerCase().includes("postalcode") &&
+            !field.toLowerCase().includes("gender") &&
+            !field.toLowerCase().includes("farmsize") &&
+            !field.toLowerCase().includes("averageinvestment") &&
+            !field.toLowerCase().includes("profilePic") &&
+            !field.toLowerCase().includes("bdc") &&
+            !field.toLowerCase().includes("active") &&
+            !field.toLowerCase().includes("quantity") &&
+            !field.toLowerCase().includes("receipt") &&
+            !field.toLowerCase().includes("recent") &&
+            !field.toLowerCase().includes("role") &&
+            field.toString() !== "lastLogin" &&
+            field.toString() !== "resetToken" &&
+            field.toString() !== "resetTokenExpiration" &&
+            !field.toLowerCase().includes("password") &&
+            field.toString() !== "removed"
+        );
+
+        if (modelName.toLowerCase() === "farmer") {
+          fields = fields.filter(
+            (field) => field.toLowerCase() !== "community"
+          );
+        }
+        if (modelName.toLowerCase() === "procurement") {
+          fields = fields.filter(
+            (field) => field.toLowerCase() !== "purchaseorder"
+          );
+        }
+        if (modelName.toLowerCase() === "payment") {
+          fields = fields.filter(
+            (field) =>
+              field.toLowerCase() !== "purchaseorder" &&
+              field.toLowerCase() !== "procurement" &&
+              field.toLowerCase() !== "farmer"
+          );
+        }
+        if (modelName.toLowerCase() === "farmer") {
+          fields = fields.filter(
+            (field) => field.toLowerCase() !== "community"
+          );
+        }
+
+        const conditions = fields.map((field) => ({
+          [field]: regex,
+        }));
+
+        const result = await Model.find({ $or: conditions }).exec();
+        searchResults.push(...result);
+      }
+    }
+
+    return next(
+      res.status(200).json({
+        status: "OK",
+        results: searchResults.length,
+        data: searchResults,
       })
     );
   });

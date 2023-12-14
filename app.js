@@ -38,23 +38,25 @@ app.use(
 app.use(express.json({ limit: "10kb" }));
 
 const authRouter = require("./routes/authRoutes");
-const userRouter = require("./routes/userRoutes");
+const communityRouter = require("./routes/communityRoutes");
 const driverRouter = require("./routes/driverRoutes");
 const farmerRouter = require("./routes/farmerRoutes");
-const communityRouter = require("./routes/communityRoutes");
-const roleRouter = require("./routes/roleRoutes");
-const purchaseOrderRouter = require("./routes/purchaseOrderRoutes");
-const procurementRouter = require("./routes/procurementRoutes");
 const paymentRouter = require("./routes/paymentRoutes");
+const procurementRouter = require("./routes/procurementRoutes");
+const purchaseOrderRouter = require("./routes/purchaseOrderRoutes");
+const roleRouter = require("./routes/roleRoutes");
+const searchRouter = require("./routes/searchRoutes")
+const userRouter = require("./routes/userRoutes");
 
 app.use("/api/v2/auth", authRouter);
-app.use("/api/v2/user", userRouter);
+app.use("/api/v2/community", communityRouter);
 app.use("/api/v2/driver", driverRouter);
 app.use("/api/v2/farmer", farmerRouter);
-app.use("/api/v2/community", communityRouter);
-app.use("/api/v2/role", roleRouter);
-app.use("/api/v2/purchase-order", purchaseOrderRouter);
-app.use("/api/v2/procurement", procurementRouter);
 app.use("/api/v2/payment", paymentRouter);
+app.use("/api/v2/procurement", procurementRouter);
+app.use("/api/v2/purchase-order", purchaseOrderRouter);
+app.use("/api/v2/role", roleRouter);
+app.use("/api/v2/search", searchRouter);
+app.use("/api/v2/user", userRouter);
 
 module.exports = app;
