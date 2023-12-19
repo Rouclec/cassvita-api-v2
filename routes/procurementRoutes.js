@@ -9,24 +9,23 @@ const {
   searchProcurement,
   generalStats,
   overview,
+  reports,
 } = require("../controllers/procurementController");
 
 const router = express.Router();
 router.use(protect);
-router.get(
-  "/stats",
-  generalStats
-);
-router.get('/overview', overview);
+router.get("/stats", generalStats);
+router.get("/overview", overview);
 router.get(
   "/search/:searchString",
   restrictTo("accountant", "admin", "procurement-officer"),
   searchProcurement
 );
 router.get(
-  "/reports/:startDate?/:endDate?",
-  stats
+  "/generate-report/:startDate/:endDate/:minAmount/:maxAmount/:communities?/:volumeUnit?",
+  reports
 );
+router.get("/reports/:startDate?/:endDate?", stats);
 router
   .route("/")
   .get(getAllProcurements)
