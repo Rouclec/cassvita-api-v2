@@ -22,7 +22,7 @@ router.get(
   searchProcurement
 );
 router.get(
-  "/generate-report/:startDate/:endDate/:minAmount/:maxAmount/:communities?/:volumeUnit?",
+  "/generate-report/:startDate/:endDate/:communities?/:volumeUnit?",
   reports
 );
 router.get("/reports/:startDate?/:endDate?", stats);

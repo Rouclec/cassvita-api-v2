@@ -550,3 +550,82 @@ exports.payAllFarmers = catchAsync(async (req, res, next) => {
     data: farmers,
   });
 });
+exports.reports = catchAsync(async (req, res, next) => {
+  const { startDate, endDate, communities, volumeUnit, minAmount, maxAmount } =
+    req?.params || {};
+
+  const communityArray = communities?.split(",") || [];
+  const volumeArray = volumeUnit?.split(",") || [];
+  //Build the aggregation pipeline based on provided params
+  let pipeline = [];
+
+  //Match stage to filter by startDate and endDate
+  pipeline.push({
+    $match: {
+      $and: [
+        { createdAt: { $gte: new Date(startDate) } },
+        { createdAt: { $lte: new Date(endDate) } },
+      ],
+    },
+  });
+
+  //Match stage to filter by community
+  if (communityArray?.length > 0 && communityArray[0] !== "all") {
+    const communityIds = communityArray.map((id) =>
+      mongoose.Types.ObjectId(id)
+    );
+
+    pipeline.push({
+      $match: {
+        community: { $in: communityIds },
+      },
+    });
+  }
+  
+  // Match stage to filter by amount range
+  if (minAmount && maxAmount) {
+    pipeline.push({
+      $match: {
+        $and: [
+          { totalPay: { $gte: minAmount * 1 } },
+          { totalPay: { $lte: maxAmount * 1 } },
+        ],
+      },
+    });
+  }
+
+  let projectStage = {
+    $project: {
+      createdAt: 1,
+      community: 1,
+      totalPay: 1,
+      name: 1,
+      gender: 1,
+    },
+  };
+
+  if (volumeArray.length > 0 && volumeArray.find((unit) => unit === "bags")) {
+    projectStage.$project.totalBags = 1;
+  }
+  if (volumeArray.length > 0 && volumeArray.find((unit) => unit === "kgs")) {
+    projectStage.$project.totalWeight = 1;
+  }
+  if (
+    (volumeArray.length > 0 && volumeArray[0] === "all") ||
+    !volumeArray.length
+  ) {
+    projectStage.$project.totalBags = 1;
+    projectStage.$project.totalWeight = 1;
+  }
+
+  pipeline.push(projectStage);
+
+  const result = await Farmer.aggregate(pipeline);
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: result,
+    })
+  );
+});
