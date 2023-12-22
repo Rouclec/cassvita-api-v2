@@ -571,9 +571,10 @@ exports.reports = catchAsync(async (req, res, next) => {
 
   //Match stage to filter by community
   if (communityArray?.length > 0 && communityArray[0] !== "all") {
-    const communityIds = communityArray.map((id) =>
-      mongoose.Types.ObjectId(id)
-    );
+    const communities = await Community.find({ name: { $in: communityArray } });
+
+    // Extract the IDs from the fetched community documents
+    const communityIds = communities.map((community) => community._id);
 
     pipeline.push({
       $match: {
