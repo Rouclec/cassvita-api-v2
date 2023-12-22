@@ -498,7 +498,7 @@ exports.reports = catchAsync(async (req, res, next) => {
     projectStage.$project.totalWeight = 1;
   }
   if (
-    (volumeArray.length > 0 && volumeArray[0] === "all") ||
+    (volumeArray.length > 0 && volumeArray[0].toLowerCase() === "select all") ||
     !volumeArray.length
   ) {
     projectStage.$project.totalBags = 1;
