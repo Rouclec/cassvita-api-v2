@@ -617,10 +617,16 @@ exports.reports = catchAsync(async (req, res, next) => {
     },
   };
 
-  if (volumeArray.length > 0 && volumeArray.find((unit) => unit === "bags")) {
+  if (
+    volumeArray.length > 0 &&
+    volumeArray.find((unit) => unit.toLowerCase() === "bags")
+  ) {
     projectStage.$project.totalBags = 1;
   }
-  if (volumeArray.length > 0 && volumeArray.find((unit) => unit === "kgs")) {
+  if (
+    volumeArray.length > 0 &&
+    volumeArray.find((unit) => unit.toLowerCase() === "kgs")
+  ) {
     projectStage.$project.totalWeight = 1;
   }
   if (
