@@ -581,7 +581,7 @@ exports.reports = catchAsync(async (req, res, next) => {
       },
     });
   }
-  
+
   // Match stage to filter by amount range
   if (minAmount && maxAmount) {
     pipeline.push({
@@ -594,10 +594,23 @@ exports.reports = catchAsync(async (req, res, next) => {
     });
   }
 
+  pipeline.push({
+    $lookup: {
+      from: "communities", // Name of the communities collection
+      localField: "community",
+      foreignField: "_id",
+      as: "communityData",
+    },
+  });
+
+  pipeline.push({
+    $unwind: "$communityData",
+  });
+
   let projectStage = {
     $project: {
       createdAt: 1,
-      community: 1,
+      community: "$communityData.name",
       totalPay: 1,
       name: 1,
       gender: 1,
