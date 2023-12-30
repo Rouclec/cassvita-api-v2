@@ -481,12 +481,22 @@ exports.reports = catchAsync(async (req, res, next) => {
     });
   }
 
+  // $lookup stage to count the number of Payment entities
+  pipeline.push({
+    $lookup: {
+      from: "payments", // Replace "payments" with the actual collection name of Payment entities
+      localField: "_id",
+      foreignField: "procurement",
+      as: "paymentCount",
+    },
+  });
+
   let projectStage = {
     $project: {
       createdAt: 1,
       community: 1,
       totalAmount: 1,
-      numberOfFarmers: 1,
+      numberOfFarmers: { $size: "$paymentCount" }, // Count the number of Payment entities
       id: 1,
     },
   };
