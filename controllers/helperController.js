@@ -313,7 +313,13 @@ exports.genericSearch = () =>
         }));
 
         const result = await Model.find({ $or: conditions }).exec();
-        searchResults.push(...result);
+
+        const updatedResults = result.map(element => ({
+          ...element.toObject(),
+          model: modelName
+        }));
+
+        searchResults.push(...updatedResults);
       }
     }
 
