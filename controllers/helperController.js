@@ -186,7 +186,7 @@ exports.genericSearch = () =>
 
     if (req.params?.model) {
       const modelName = models.find(
-        (model) => model.toLowerCase() === req.params.model
+        (model) => model.toLowerCase() === req.params.model.toLowerCase()
       );
       const Model = mongoose.model(modelName);
 
