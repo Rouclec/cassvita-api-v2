@@ -180,7 +180,14 @@ exports.genericSearch = () =>
     const { query } = req.params;
     const regex = new RegExp(query, "i"); // Case-insensitive regex
 
-    const models = mongoose.modelNames();
+    let models = mongoose.modelNames();
+
+    models = models.filter(
+      (model) =>
+        model.toLowerCase() !== "role" &&
+        model.toLowerCase() !== "driver" &&
+        model.toLowerCase() !== "purchaseorder"
+    );
 
     let searchResults = [];
 
@@ -265,18 +272,19 @@ exports.genericSearch = () =>
             !field.toLowerCase().includes("weight") &&
             !field.toLowerCase().includes("bag") &&
             !field.toLowerCase().includes("updated") &&
-            !field.toLowerCase().includes("taxid") &&
+            !field.toLowerCase().includes("id") &&
             !field.toLowerCase().includes("postalcode") &&
             !field.toLowerCase().includes("gender") &&
             !field.toLowerCase().includes("farmsize") &&
             !field.toLowerCase().includes("averageinvestment") &&
-            !field.toLowerCase().includes("profilePic") &&
+            !field.toLowerCase().includes("profilepic") &&
             !field.toLowerCase().includes("bdc") &&
             !field.toLowerCase().includes("active") &&
             !field.toLowerCase().includes("quantity") &&
             !field.toLowerCase().includes("receipt") &&
             !field.toLowerCase().includes("recent") &&
             !field.toLowerCase().includes("role") &&
+            !field.toLowerCase().includes("status") &&
             field.toString() !== "lastLogin" &&
             field.toString() !== "resetToken" &&
             field.toString() !== "resetTokenExpiration" &&
@@ -308,15 +316,17 @@ exports.genericSearch = () =>
           );
         }
 
+        console.log({ fields });
+
         const conditions = fields.map((field) => ({
           [field]: regex,
         }));
 
         const result = await Model.find({ $or: conditions }).exec();
 
-        const updatedResults = result.map(element => ({
+        const updatedResults = result.map((element) => ({
           ...element.toObject(),
-          model: modelName
+          model: modelName,
         }));
 
         searchResults.push(...updatedResults);
