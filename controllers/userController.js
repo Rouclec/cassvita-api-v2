@@ -1,9 +1,11 @@
 const User = require("../models/userModel");
+const Role = require("../models/roleModel");
 const catchAsync = require("../utils/catchAsync");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const { getAll, getOne } = require("./helperController");
 const APIFeatures = require("../utils/apiFeatures");
+const slugify = require("slugify");
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(
@@ -16,7 +18,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       city: req.body?.city,
       state: req.body?.state,
       postalCode: req.body?.postalCode,
-      taxID: req.body?.taxID
+      taxID: req.body?.taxID,
     },
     { runValidators: false }
   );
@@ -31,7 +33,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   let Model = User;
-  const features = new APIFeatures(Model.find({ removed: { $ne: true } }), req.query)
+  const features = new APIFeatures(
+    Model.find({ removed: { $ne: true } }),
+    req.query
+  )
     .filter()
     .sort("-createdAt")
     .limitFields()
@@ -46,16 +51,16 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   delete newQueryString.limit;
   newQueryString = {
     ...newQueryString,
-    removed: { $ne: true }
-  }
-  const count = await Model.count(newQueryString) - 1;
+    removed: { $ne: true },
+  };
+  const count = (await Model.count(newQueryString)) - 1;
   let page = "1 of 1";
   if (pageQuery && limitQuery) {
     const pages = Math.ceil(count / limitQuery);
     page = `${pageQuery} of ${pages}`;
   }
 
-  docs = docs.filter(doc => doc.id !== req.user.id)
+  docs = docs.filter((doc) => doc.id !== req.user.id);
 
   res.status(200).json({
     status: "OK",
@@ -66,23 +71,69 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 });
 
 exports.removeUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id)
+  const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(res.status(404).json({
-      status: 'Not found',
-      message: "No such user"
-    }))
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: "No such user",
+      })
+    );
   }
 
-  const updatedUser = await User.findByIdAndUpdate(user?._id, { removed: true })
+  const updatedUser = await User.findByIdAndUpdate(user?._id, {
+    removed: true,
+  });
   return next(
     res.status(200).json({
       status: "OK",
-      data: updatedUser
+      data: updatedUser,
     })
-  )
-})
+  );
+});
+
+exports.updateRole = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: "No such user",
+      })
+    );
+  }
+
+  const userRole = await Role.findOne({
+    code: slugify(req.params.role, { lower: true }),
+  });
+
+  if (!userRole) {
+    return next(
+      res.status(404).json({
+        status: "Not found",
+        message: `No such role, ${req.params.role} found`,
+      })
+    );
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user?._id,
+    {
+      role: userRole._id,
+    },
+    { new: true }
+  );
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: updatedUser,
+    })
+  );
+});
+
 exports.getUser = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -124,8 +175,8 @@ exports.getUser = catchAsync(async (req, res, next) => {
   //5) pass user to the the req and move on to next middleware
   return next(
     res.status(200).json({
-      status: 'OK',
-      data: user
+      status: "OK",
+      data: user,
     })
-  )
-})
+  );
+});

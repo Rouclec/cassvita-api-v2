@@ -6,6 +6,9 @@ const Email = require("../utils/email");
 const crypto = require("crypto");
 const Role = require("../models/roleModel");
 const slugify = require("slugify");
+const sharp = require("sharp");
+const fs = require("fs");
+const aws = require("aws-sdk");
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -36,16 +39,69 @@ const createAuthToken = (user, statusCode, res) => {
   });
 };
 
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const uploadFile = (profilePicName) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const file = fs.readFileSync(`public/img/profile-pic/profile.jpeg`);
+      const BUCKET = process.env.AWS_BUCKET;
+
+      const uploadParams = {
+        Bucket: BUCKET,
+        Key: `${profilePicName}`,
+        Body: file,
+      };
+
+      s3.upload(uploadParams, function (err, data) {
+        if (err) {
+          return reject(err);
+        }
+        if (data) {
+          return resolve(data);
+        }
+      });
+    } catch (error) {
+      return reject(error);
+    }
+  });
+};
+
+exports.resizePhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  await sharp(req.file.buffer)
+    .resize(500, 500) //reizes the image to 500x500
+    .toFormat("jpeg") //converts the image to a jpeg format
+    .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
+    .toFile(`public/img/profile-pic/profile.jpeg`);
+
+  res = await uploadFile(`${req.file.originalname}`);
+  req.profilePic = res.Location;
+  next();
+});
+
 exports.addUser = catchAsync(async (req, res, next) => {
   const {
-    fullName,
-    username,
+    firstName,
+    lastName,
     email,
     password,
     phoneNumber,
+    country,
     passwordConfirm,
     role,
   } = req.body;
+
+  let profilePic;
+
+  if (req.profilePic) {
+    profilePic = req.profilePic;
+  } else {
+    profilePic = undefined;
+  }
 
   const userRole = await Role.findOne({
     code: slugify(role, { lower: true }),
@@ -61,10 +117,12 @@ exports.addUser = catchAsync(async (req, res, next) => {
   }
 
   const newUser = {
-    fullName,
-    username,
+    fullName: firstName + " " + lastName,
+    username: slugify(firstName),
     email,
     password,
+    country,
+    profilePic,
     phoneNumber,
     passwordConfirm,
     createdBy: req.user._id,
@@ -95,7 +153,9 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
-  let user = await User.findOne({ email, removed: { $ne: true } }).select("+password");
+  let user = await User.findOne({ email, removed: { $ne: true } }).select(
+    "+password"
+  );
   if (!(user && (await user.comparePassword(password)))) {
     // check if user exists, and password is correct
     return next(
@@ -172,7 +232,10 @@ exports.restrictTo = (...roles) => {
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   //1) get the user by email
-  const user = await User.findOne({ email: req.body.email, removed: { $ne: true } });
+  const user = await User.findOne({
+    email: req.body.email,
+    removed: { $ne: true },
+  });
   if (!user) {
     return next(
       res.status(404).json({
@@ -304,7 +367,6 @@ exports.updatePasswword = catchAsync(async (req, res, next) => {
   createAuthToken(user, 200, res);
 });
 
-
 exports.refreshToken = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.body?.userId);
   if (!user) {
@@ -315,5 +377,5 @@ exports.refreshToken = catchAsync(async (req, res, next) => {
       })
     );
   }
-  return createAuthToken(user, 200, res)
-})
+  return createAuthToken(user, 200, res);
+});

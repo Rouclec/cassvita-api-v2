@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    country: String,
+    profilePic: String,
     removed: {
       type: Boolean,
       default: false,
