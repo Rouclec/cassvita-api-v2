@@ -17,6 +17,7 @@ const {
   overView,
   payAllFarmers,
   reports,
+  individualReport,
 } = require("../controllers/farmerController");
 const {
   stats: allFarmerStats,
@@ -67,6 +68,7 @@ router
     getAllFarmersFromCommunity
   );
 router.get("/stats", stats);
+router.get("/individual-report/:farmers/:filter?/:startDate?/:endDate?", individualReport);
 router.get(
   "/generate-report/:startDate/:endDate/:minAmount/:maxAmount/:communities?/:volumeUnit?",
   reports

@@ -169,6 +169,58 @@ const getStats = (farmers) => {
   });
 };
 
+const getIndividualStats = (farmers, startDate, endDate, filter) => {
+  let group = {
+    _id: { $year: "$createdAt" },
+    amount: { $sum: "$amount" },
+  };
+
+  if (filter === "month") {
+    group = {
+      _id: { $dayOfMonth: "$createdAt" },
+      amount: { $sum: "$amount" }
+    }
+  } else if (filter === "year" || filter === "quater") {
+    group = {
+      _id: { $month: "$createdAt" },
+      amount: { $sum: "$amount" },
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    try {
+      let stats = [];
+      farmers.forEach(async (farmer) => {
+        let paymentStats = await Payment.aggregate([
+          {
+            $match: {
+              $and: [
+                { createdAt: { $gte: startDate } },
+                { createdAt: { $lt: endDate } },
+                { farmer: mongoose.Types.ObjectId(farmer._id) },
+                { status: "Paid" },
+              ],
+            },
+          },
+          {
+            $group: group,
+          },
+        ]);
+        const stat = {
+          farmer: farmer.name,
+          stats: paymentStats,
+        };
+        stats.push(stat);
+        if (stats.length === farmers.length) {
+          return resolve(stats);
+        }
+      });
+    } catch (error) {
+      return reject(error);
+    }
+  });
+};
+
 exports.uploadXlFile = multer({
   storage: fileStorage,
 }).single("farmersData");
@@ -528,6 +580,37 @@ exports.overView = catchAsync(async (_, res, next) => {
   );
 });
 
+exports.individualReport = catchAsync(async (req, res, next) => {
+  let stats = [];
+
+  const nameArray = req?.params?.farmers.split(",");
+
+  let today = new Date();
+
+  const startDate = req?.params?.startDate
+    ? new Date(req?.params?.startDate)
+    : new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+  const endDate = req?.params?.endDate
+    ? new Date(req?.params?.endDate)
+    : new Date(today.getFullYear() + 100, today.getMonth(), today.getDate());
+
+  const farmers = await Farmer.find({ name: { $in: nameArray } });
+  if (farmers.length > 0)
+    stats = await getIndividualStats(
+      farmers,
+      startDate,
+      endDate,
+      req.params?.filter
+    );
+
+  return next(
+    res.status(200).json({
+      status: "OK",
+      data: stats,
+    })
+  );
+});
+
 //Technical script
 
 exports.payAllFarmers = catchAsync(async (req, res, next) => {
@@ -550,6 +633,9 @@ exports.payAllFarmers = catchAsync(async (req, res, next) => {
     data: farmers,
   });
 });
+
+//End of technical script
+
 exports.reports = catchAsync(async (req, res, next) => {
   const { startDate, endDate, communities, volumeUnit, minAmount, maxAmount } =
     req?.params || {};
