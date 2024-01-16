@@ -95,6 +95,17 @@ exports.addUser = catchAsync(async (req, res, next) => {
     role,
   } = req.body;
 
+  const userFound = await User.exists({ email, removed: false });
+
+  if (userFound) {
+    return next(
+      res.status(500).json({
+        status: "Server error",
+        message: `Email ${email} already in use, please try another`,
+      })
+    );
+  }
+
   let profilePic;
 
   if (req.profilePic) {

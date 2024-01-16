@@ -151,6 +151,8 @@ const getStats = (farmers) => {
             $group: {
               _id: { $month: "$createdAt" },
               amount: { $sum: "$amount" },
+              weight: { $sum: "$weight" },
+              bags: { $sum: "$bags" },
             },
           },
         ]);
@@ -173,17 +175,23 @@ const getIndividualStats = (farmers, startDate, endDate, filter) => {
   let group = {
     _id: { $year: "$createdAt" },
     amount: { $sum: "$amount" },
+    weight: { $sum: "$weight" },
+    bags: { $sum: "$bags" },
   };
 
   if (filter === "month") {
     group = {
       _id: { $dayOfMonth: "$createdAt" },
-      amount: { $sum: "$amount" }
-    }
+      amount: { $sum: "$amount" },
+      weight: { $sum: "$weight" },
+      bags: { $sum: "$bags" },
+    };
   } else if (filter === "year" || filter === "quater") {
     group = {
       _id: { $month: "$createdAt" },
       amount: { $sum: "$amount" },
+      weight: { $sum: "$weight" },
+      bags: { $sum: "$bags" },
     };
   }
 
