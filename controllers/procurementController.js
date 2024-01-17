@@ -347,6 +347,7 @@ exports.generalStats = catchAsync(async (req, res, next) => {
 exports.stats = catchAsync(async (req, res, next) => {
   let firstDay = new Date(2022, 0, 1);
   let lastDay = new Date(3000, 11, 31);
+  const filter = req?.params?.filter;
 
   let curr = new Date(); // get current date
   let first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
@@ -360,6 +361,29 @@ exports.stats = catchAsync(async (req, res, next) => {
     lastDay = new Date(req.params.endDate);
   }
 
+  let group = {
+    _id: { $year: "$createdAt" },
+    amount: { $sum: "$amount" },
+    weight: { $sum: "$weight" },
+    bags: { $sum: "$bags" },
+  };
+
+  if (filter === "month") {
+    group = {
+      _id: { $dayOfMonth: "$createdAt" },
+      totalAmount: { $sum: "$totalAmount" },
+      totalKg: { $sum: "$totalWeight" },
+      totalBags: { $sum: "$totalBags" },
+    };
+  } else if (filter === "year" || filter === "quater") {
+    group = {
+      _id: { $month: "$createdAt" },
+      totalAmount: { $sum: "$totalAmount" },
+      totalKg: { $sum: "$totalWeight" },
+      totalBags: { $sum: "$totalBags" },
+    };
+  }
+
   let procurements = await Procurement.aggregate([
     {
       $match: {
@@ -370,12 +394,7 @@ exports.stats = catchAsync(async (req, res, next) => {
       },
     },
     {
-      $group: {
-        _id: { $month: "$createdAt" },
-        totalAmount: { $sum: "$totalAmount" },
-        totalKg: { $sum: "$totalWeight" },
-        totalBags: { $sum: "$totalBags" },
-      },
+      $group: group,
     },
   ]);
 

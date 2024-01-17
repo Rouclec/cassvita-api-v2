@@ -25,7 +25,7 @@ router.get(
   "/generate-report/:startDate/:endDate/:communities?/:volumeUnit?",
   reports
 );
-router.get("/reports/:startDate?/:endDate?", stats);
+router.get("/reports/:startDate?/:endDate?/:filter?", stats);
 router
   .route("/")
   .get(getAllProcurements)
