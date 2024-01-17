@@ -373,9 +373,9 @@ exports.stats = catchAsync(async (req, res, next) => {
 
   let group = {
     _id: { $year: "$createdAt" },
-    amount: { $sum: "$totalAmount" },
-    weight: { $sum: "$totalWeight" },
-    bags: { $sum: "$totalBags" },
+    totalAmount: { $sum: "$totalAmount" },
+    totalKg: { $sum: "$totalWeight" },
+    totalBags: { $sum: "$totalBags" },
   };
 
   if (filter === "month") {
