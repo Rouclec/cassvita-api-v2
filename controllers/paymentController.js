@@ -82,11 +82,6 @@ const initiateTopUp = async (paymentRequest) => {
         },
       }
     );
-
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
     return await response.json();
   } catch (error) {
     return error;
@@ -114,11 +109,6 @@ const initiatePayment = async (paymentRequest) => {
         },
       }
     );
-
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
     return await response.json();
   } catch (error) {
     return error;
@@ -150,7 +140,7 @@ const checkTransactionStatus = async (reference) => {
       const data = await response.json();
       return data;
     }
-    return await response.json()
+    return await response.json();
   } catch (error) {
     return error;
   }
@@ -481,6 +471,7 @@ exports.pay = catchAsync(async (req, res, next) => {
   if (response?.reference) {
     let intervalId;
     let elapsedTime = 0;
+    let responseSent = false; // Flag variable to track if a response has been sent
 
     async function checkResult() {
       const result = await checkTransactionStatus(response.reference);
@@ -493,34 +484,47 @@ exports.pay = catchAsync(async (req, res, next) => {
           req?.body?.paymentId,
           { status: "Paid" }
         );
-        return res.status(200).json({
-          status: "OK",
-          data: confirmedPayment,
-          // data: `Payment ${req?.body?.paymentId} made successfully`,
-        });
+
+        if (!responseSent) {
+          // Check if a response has been sent before
+          responseSent = true; // Set the flag to true
+          return res.status(200).json({
+            status: "OK",
+            data: confirmedPayment,
+          });
+        }
       } else if (result?.status === "FAILED") {
         clearInterval(intervalId);
-        //return error
-        return res.status(500).json({
-          status: "FAILED",
-          message: "Transaction did not complete",
-        });
+
+        if (!responseSent) {
+          // Check if a response has been sent before
+          responseSent = true; // Set the flag to true
+          return res.status(500).json({
+            status: "FAILED",
+            message: "Transaction did not complete",
+          });
+        }
       }
 
       // Increment elapsed time and check if it exceeds 2 minutes (120 seconds)
       elapsedTime += 5; // Assuming the interval runs every 5 seconds
       if (elapsedTime >= 120) {
         clearInterval(intervalId);
-        return res.status(500).json({
-          status: "FAILED",
-          message: "Transaction timed out",
-        });
+
+        if (!responseSent) {
+          // Check if a response has been sent before
+          responseSent = true; // Set the flag to true
+          return res.status(500).json({
+            status: "FAILED",
+            message: "Transaction timed out",
+          });
+        }
       }
     }
 
     intervalId = setInterval(checkResult, 5000);
   } else {
-    return next(res.status(500).json(response));
+    return res.status(500).json(response);
   }
 });
 
