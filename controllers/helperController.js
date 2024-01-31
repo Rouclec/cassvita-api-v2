@@ -341,3 +341,24 @@ exports.genericSearch = () =>
       })
     );
   });
+
+
+  exports.getTokenFromCampay = async (creds) => {
+    try {
+        const response = await fetch(`${process.env.CAMPAY_BASE_URL_DEMO}/token/`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(creds),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        }
+        return await response.json();
+    } catch (error) {
+        return error;
+    }
+};

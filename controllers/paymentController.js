@@ -2,7 +2,12 @@ const Farmer = require("../models/farmerModel");
 const Payment = require("../models/paymentModel");
 const PurchaseOrder = require("../models/purchaseOrderModel");
 const catchAsync = require("../utils/catchAsync");
-const { getAll, getOne, search } = require("./helperController");
+const {
+  getAll,
+  getOne,
+  search,
+  getTokenFromCampay,
+} = require("./helperController");
 
 const multer = require("multer");
 const sharp = require("sharp");
@@ -56,6 +61,99 @@ const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
 });
+
+const initiateTopUp = async (paymentRequest) => {
+  const creds = {
+    username: process.env.CAMPAY_USER,
+    password: process.env.CAMPAY_PWD,
+  };
+
+  const token = await getTokenFromCampay(creds);
+
+  try {
+    const response = await fetch(
+      `${process.env.CAMPAY_BASE_URL_DEMO}/collect/`,
+      {
+        method: "post",
+        body: JSON.stringify(paymentRequest),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    return await response.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+const initiatePayment = async (paymentRequest) => {
+  const creds = {
+    username: process.env.CAMPAY_USER,
+    password: process.env.CAMPAY_PWD,
+  };
+
+  // get token from campay.
+  const token = await getTokenFromCampay(creds);
+
+  try {
+    const response = await fetch(
+      `${process.env.CAMPAY_BASE_URL_DEMO}/withdraw/`,
+      {
+        method: "post",
+        body: JSON.stringify(paymentRequest),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    return await response.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+const checkTransactionStatus = async (reference) => {
+  const creds = {
+    username: process.env.CAMPAY_USER,
+    password: process.env.CAMPAY_PWD,
+  };
+
+  // get token from campay.
+  const token = await getTokenFromCampay(creds);
+
+  try {
+    const response = await fetch(
+      `${process.env.CAMPAY_BASE_URL_DEMO}/transaction/${reference}`,
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+  } catch (error) {
+    return error;
+  }
+};
 
 exports.uploadReceipt = upload.single("receipt");
 
@@ -323,3 +421,114 @@ exports.validateAllPayment = catchAsync(async (req, res, next) => {
     })
   );
 });
+
+exports.topUp = catchAsync(async (req, res, next) => {
+  const paymentRequest = {
+    from: req?.body?.phoneNumber,
+    external_ref: req?.body?.ref,
+    amount: req?.body?.amount * 1,
+  };
+
+  const paymentResponse = await initiateTopUp(paymentRequest);
+
+  if (paymentResponse?.reference) {
+    let intervalId;
+    let elapsedTime = 0;
+
+    async function checkResult() {
+      const result = await checkTransactionStatus(paymentResponse.reference);
+      // Perform checks on the result
+      if (result.status === "SUCCESSFUL") {
+        clearInterval(intervalId);
+
+        return res.status(200).json({
+          status: "OK",
+          data: result,
+        });
+      } else if (result.status === "FAILED") {
+        clearInterval(intervalId);
+        return res.status(500).json({
+          status: "FAILED",
+          message: "Transaction did not complete",
+        });
+      }
+
+      // Increment elapsed time and check if it exceeds 2 minutes (120 seconds)
+      elapsedTime += 5; // Assuming the interval runs every 5 seconds
+      if (elapsedTime >= 120) {
+        clearInterval(intervalId);
+        return res.status(500).json({
+          status: "FAILED",
+          message: "Transaction timed out",
+        });
+      }
+    }
+
+    intervalId = setInterval(checkResult, 5000);
+  } else {
+    return res.status(500).json(response);
+  }
+});
+
+exports.pay = catchAsync(async (req, res, next) => {
+  const response = await initiatePayment({
+    amount: req?.body?.amount * 1,
+    to: req?.body?.phoneNumber,
+    description: req?.body?.ref,
+  });
+
+  if (response?.reference) {
+    let intervalId;
+    let elapsedTime = 0;
+
+    async function checkResult() {
+      const result = await checkTransactionStatus(response.reference);
+
+      // Perform checks on the result
+      if (result.status === "SUCCESSFUL") {
+        clearInterval(intervalId);
+
+        const confirmedPayment = await Payment.findByIdAndUpdate(
+          req?.body?.paymentId,
+          { status: "Paid" }
+        );
+        return res.status(200).json({
+          status: "OK",
+          data: confirmedPayment,
+          // data: `Payment ${req?.body?.paymentId} made successfully`,
+        });
+      } else if (result?.status === "FAILED") {
+        clearInterval(intervalId);
+        //return error
+        return res.status(500).json({
+          status: "FAILED",
+          message: "Transaction did not complete",
+        });
+      }
+
+      // Increment elapsed time and check if it exceeds 2 minutes (120 seconds)
+      elapsedTime += 5; // Assuming the interval runs every 5 seconds
+      if (elapsedTime >= 120) {
+        clearInterval(intervalId);
+        return res.status(500).json({
+          status: "FAILED",
+          message: "Transaction timed out",
+        });
+      }
+    }
+
+    intervalId = setInterval(checkResult, 5000);
+  } else {
+    return next(res.status(500).json(response));
+  }
+});
+
+// exports.confirmPaymentTransaction = catchAsync(async (req, res, next) => {
+//   const reference = req?.query?.reference;
+
+//   const response = await checkTransactionStatus(reference);
+
+//   console.log({ response });
+
+//   return next(res.send("OK"));
+// });

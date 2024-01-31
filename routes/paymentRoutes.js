@@ -10,6 +10,9 @@ const {
   searchPayment,
   getGeneralPaymentStats,
   validateAllPayment,
+  topUp,
+  pay,
+  confirmPaymentTransaction,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
@@ -42,6 +45,10 @@ router.patch(
   resizePhoto,
   changePaymentStatus
 );
+
+router.post("/top-up", topUp);
+router.post("/pay",pay)
+// router.get("/confirm-payment-transaction",confirmPaymentTransaction)
 
 
 module.exports = router;
