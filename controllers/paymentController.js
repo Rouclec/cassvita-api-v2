@@ -70,9 +70,7 @@ const initiateTopUp = async (paymentRequest) => {
     password: process.env.CAMPAY_PWD,
   };
 
-
   const token = await getTokenFromCampay(creds);
-
 
   try {
     const response = await axios.post(
@@ -479,6 +477,7 @@ exports.pay = catchAsync(async (req, res, next) => {
     description: req?.body?.ref,
   });
 
+
   if (response?.reference) {
     let intervalId;
     let elapsedTime = 0;
@@ -535,7 +534,17 @@ exports.pay = catchAsync(async (req, res, next) => {
 
     intervalId = setInterval(checkResult, 5000);
   } else {
-    return res.status(500).json(response);
+    if (
+      response?.response?.data?.message.toLowerCase() ===
+      "insufficient  balance"
+    ) {
+      return res.status(500).json({
+        status: "Server error",
+        message: "Insufficient balance",
+      });
+    } else {
+      return res.status(500).json(response);
+    }
   }
 });
 
