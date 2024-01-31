@@ -150,6 +150,7 @@ const checkTransactionStatus = async (reference) => {
       const data = await response.json();
       return data;
     }
+    return await response.json()
   } catch (error) {
     return error;
   }
