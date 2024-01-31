@@ -68,7 +68,12 @@ const initiateTopUp = async (paymentRequest) => {
     password: process.env.CAMPAY_PWD,
   };
 
+  console.log("credentails from intiateTopUp function: ", creds);
+  console.log("payment request: ", paymentRequest);
+
   const token = await getTokenFromCampay(creds);
+
+  console.log("token from campay: ", token);
 
   try {
     const response = await fetch(
@@ -82,7 +87,9 @@ const initiateTopUp = async (paymentRequest) => {
         },
       }
     );
-    return await response.json();
+    const data = await response.json();
+    console.log("data from top up request: ", data);
+    return data;
   } catch (error) {
     return error;
   }
@@ -421,6 +428,7 @@ exports.topUp = catchAsync(async (req, res, next) => {
   };
 
   const paymentResponse = await initiateTopUp(paymentRequest);
+  console.log("top up response: ", paymentResponse);
 
   if (paymentResponse?.reference) {
     let intervalId;
@@ -428,6 +436,8 @@ exports.topUp = catchAsync(async (req, res, next) => {
 
     async function checkResult() {
       const result = await checkTransactionStatus(paymentResponse.reference);
+
+      console.log("top up transaction result: ", result);
       // Perform checks on the result
       if (result.status === "SUCCESSFUL") {
         clearInterval(intervalId);

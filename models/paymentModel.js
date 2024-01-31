@@ -94,7 +94,7 @@ paymentSchema.statics.subtractAmountOwed = async function (farmer, amount) {
 };
 
 paymentSchema.statics.closeProcurement = async function (procurementId) {
-  const procurementFound = await Procurement.findById(procurementId);
+  // const procurementFound = await Procurement.findById(procurementId);
   const paymentsFound = await Payment.find({ procurement: procurementId });
 
   let paidFully = true;
