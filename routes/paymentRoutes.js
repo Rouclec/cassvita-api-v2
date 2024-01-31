@@ -12,13 +12,11 @@ const {
   validateAllPayment,
   topUp,
   pay,
-  confirmPaymentTransaction,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
 
 router.use(protect);
-
 
 router.patch("/validate-all", restrictTo("admin"), validateAllPayment);
 
@@ -46,9 +44,8 @@ router.patch(
   changePaymentStatus
 );
 
-router.post("/top-up", topUp);
-router.post("/pay",pay)
+router.post("/top-up", restrictTo("accountant", "admin"), topUp);
+router.post("/pay", restrictTo("accountant", "admin"), pay);
 // router.get("/confirm-payment-transaction",confirmPaymentTransaction)
-
 
 module.exports = router;
