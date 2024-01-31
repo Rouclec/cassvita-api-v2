@@ -12,6 +12,7 @@ const {
   validateAllPayment,
   topUp,
   pay,
+  checkAccountBalance,
 } = require("../controllers/paymentController");
 
 const router = express.Router();
@@ -35,6 +36,12 @@ router.get(
 router.get("/", getAllPayments);
 router.get("/stats", getGeneralPaymentStats);
 
+router.get(
+  "/account-balance",
+  restrictTo("accountant", "admin"),
+  checkAccountBalance
+);
+
 router.get("/:id", restrictTo("accountant", "admin", "manager"), getPayment);
 router.patch(
   "/:id/:status",
@@ -46,6 +53,7 @@ router.patch(
 
 router.post("/top-up", restrictTo("accountant", "admin"), topUp);
 router.post("/pay", restrictTo("accountant", "admin"), pay);
+
 // router.get("/confirm-payment-transaction",confirmPaymentTransaction)
 
 module.exports = router;

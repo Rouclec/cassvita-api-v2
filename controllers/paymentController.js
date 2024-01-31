@@ -144,6 +144,32 @@ const checkTransactionStatus = async (reference) => {
   }
 };
 
+const getAccountBalance = async () => {
+  const creds = {
+    username: process.env.CAMPAY_USER,
+    password: process.env.CAMPAY_PWD,
+  };
+
+  // get token from campay.
+  const token = await getTokenFromCampay(creds);
+
+  try {
+    const response = await axios.get(
+      `${process.env.CAMPAY_BASE_URL_DEMO}/balance`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token.token}`,
+        },
+      }
+    );
+    const data = response?.data;
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
 exports.uploadReceipt = upload.single("receipt");
 
 exports.resizePhoto = catchAsync(async (req, res, next) => {
@@ -477,7 +503,6 @@ exports.pay = catchAsync(async (req, res, next) => {
     description: req?.body?.ref,
   });
 
-
   if (response?.reference) {
     let intervalId;
     let elapsedTime = 0;
@@ -546,6 +571,15 @@ exports.pay = catchAsync(async (req, res, next) => {
       return res.status(500).json(response);
     }
   }
+});
+
+exports.checkAccountBalance = catchAsync(async (req, res, next) => {
+  const response = await getAccountBalance();
+
+  return res.status(200).json({
+    status: "OK",
+    data: response,
+  });
 });
 
 // exports.confirmPaymentTransaction = catchAsync(async (req, res, next) => {
