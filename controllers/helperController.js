@@ -3,6 +3,7 @@ const Farmer = require("../models/farmerModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
 const User = require("../models/userModel");
+const axios = require("axios");
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -316,8 +317,6 @@ exports.genericSearch = () =>
           );
         }
 
-        console.log({ fields });
-
         const conditions = fields.map((field) => ({
           [field]: regex,
         }));
@@ -343,21 +342,21 @@ exports.genericSearch = () =>
   });
 
 exports.getTokenFromCampay = async (creds) => {
-  console.log("credentials: ", creds);
   try {
-    const response = await fetch(`${process.env.CAMPAY_BASE_URL_DEMO}/token/`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(creds),
-    });
+    const response = await axios.post(
+      `${process.env.CAMPAY_BASE_URL_DEMO}/token/`,
+      creds,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    if (response.ok) {
-      const data = await response.json();
-      return data;
+    if (response.status === 200) {
+      return response.data;
     }
-    return await response.json();
+    return response.data;
   } catch (error) {
     return error;
   }

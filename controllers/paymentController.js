@@ -17,6 +17,8 @@ const Procurement = require("../models/procumentModel");
 const mongoose = require("mongoose");
 const Community = require("../models/communityModel");
 
+const axios = require("axios");
+
 const multerStorage = multer.memoryStorage();
 const s3 = new aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -68,27 +70,23 @@ const initiateTopUp = async (paymentRequest) => {
     password: process.env.CAMPAY_PWD,
   };
 
-  console.log("credentails from intiateTopUp function: ", creds);
-  console.log("payment request: ", paymentRequest);
 
   const token = await getTokenFromCampay(creds);
 
-  console.log("token from campay: ", token);
 
   try {
-    const response = await fetch(
+    const response = await axios.post(
       `${process.env.CAMPAY_BASE_URL_DEMO}/collect/`,
+      paymentRequest,
       {
-        method: "post",
-        body: JSON.stringify(paymentRequest),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${token.token}`,
         },
       }
     );
-    const data = await response.json();
-    console.log("data from top up request: ", data);
+
+    const data = response.data;
     return data;
   } catch (error) {
     return error;
@@ -105,18 +103,18 @@ const initiatePayment = async (paymentRequest) => {
   const token = await getTokenFromCampay(creds);
 
   try {
-    const response = await fetch(
+    const response = await axios.post(
       `${process.env.CAMPAY_BASE_URL_DEMO}/withdraw/`,
+      paymentRequest,
       {
-        method: "post",
-        body: JSON.stringify(paymentRequest),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${token.token}`,
         },
       }
     );
-    return await response.json();
+    const data = response?.data;
+    return data;
   } catch (error) {
     return error;
   }
@@ -132,22 +130,17 @@ const checkTransactionStatus = async (reference) => {
   const token = await getTokenFromCampay(creds);
 
   try {
-    const response = await fetch(
+    const response = await axios.get(
       `${process.env.CAMPAY_BASE_URL_DEMO}/transaction/${reference}`,
       {
-        method: "get",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Token ${token.token}`,
         },
       }
     );
-
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
-    return await response.json();
+    const data = response?.data;
+    return data;
   } catch (error) {
     return error;
   }
@@ -428,40 +421,48 @@ exports.topUp = catchAsync(async (req, res, next) => {
   };
 
   const paymentResponse = await initiateTopUp(paymentRequest);
-  console.log("top up response: ", paymentResponse);
 
   if (paymentResponse?.reference) {
     let intervalId;
     let elapsedTime = 0;
+    let responseSent = false;
 
     async function checkResult() {
       const result = await checkTransactionStatus(paymentResponse.reference);
 
-      console.log("top up transaction result: ", result);
       // Perform checks on the result
       if (result.status === "SUCCESSFUL") {
         clearInterval(intervalId);
 
-        return res.status(200).json({
-          status: "OK",
-          data: result,
-        });
+        if (!responseSent) {
+          responseSent = true;
+          return res.status(200).json({
+            status: "OK",
+            data: result,
+          });
+        }
       } else if (result.status === "FAILED") {
         clearInterval(intervalId);
-        return res.status(500).json({
-          status: "FAILED",
-          message: "Transaction did not complete",
-        });
+        if (!responseSent) {
+          responseSent = true;
+          return res.status(500).json({
+            status: "FAILED",
+            message: "Transaction did not complete",
+          });
+        }
       }
 
       // Increment elapsed time and check if it exceeds 2 minutes (120 seconds)
       elapsedTime += 5; // Assuming the interval runs every 5 seconds
       if (elapsedTime >= 120) {
         clearInterval(intervalId);
-        return res.status(500).json({
-          status: "FAILED",
-          message: "Transaction timed out",
-        });
+        if (!responseSent) {
+          responseSent = true;
+          return res.status(500).json({
+            status: "FAILED",
+            message: "Transaction timed out",
+          });
+        }
       }
     }
 
