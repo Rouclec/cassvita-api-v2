@@ -466,7 +466,7 @@ exports.topUp = catchAsync(async (req, res, next) => {
 
     intervalId = setInterval(checkResult, 5000);
   } else {
-    return res.status(500).json(response);
+    return res.status(500).json(paymentResponse);
   }
 });
 
