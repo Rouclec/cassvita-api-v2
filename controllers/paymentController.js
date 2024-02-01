@@ -199,8 +199,8 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
     {
       $match: {
         $and: [
-          { createdAt: { $gt: firstDay } },
-          { createdAt: { $lte: lastDay } },
+          { updatedAt: { $gt: firstDay } },
+          { updatedAt: { $lte: lastDay } },
         ],
       },
     },
@@ -217,8 +217,8 @@ exports.getGeneralPaymentStats = catchAsync(async (req, res, next) => {
     {
       $match: {
         $and: [
-          { createdAt: { $gt: firstDay } },
-          { createdAt: { $lte: lastDay } },
+          { updatedAt: { $gt: firstDay } },
+          { updatedAt: { $lte: lastDay } },
         ],
       },
     },
