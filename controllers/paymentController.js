@@ -170,6 +170,27 @@ const getAccountBalance = async () => {
   }
 };
 
+const subtractAmountOwed = async function (farmer, amount) {
+  const farmerFound = await Farmer.findById(farmer);
+  await Farmer.findByIdAndUpdate(farmer, {
+    amountOwed: farmerFound.amountOwed - amount,
+  });
+};
+
+const closeProcurement = async function (procurementId) {
+  // const procurementFound = await Procurement.findById(procurementId);
+  const paymentsFound = await Payment.find({ procurement: procurementId });
+
+  let paidFully = true;
+
+  paymentsFound.forEach((payment) => {
+    if (payment.status === "Pending") paidFully = false;
+  });
+
+  if (paidFully === true)
+    await Procurement.findByIdAndUpdate(procurementId, { status: "closed" });
+};
+
 exports.uploadReceipt = upload.single("receipt");
 
 exports.resizePhoto = catchAsync(async (req, res, next) => {
@@ -286,18 +307,24 @@ exports.changePaymentStatus = catchAsync(async (req, res, next) => {
       });
     }
 
-    await PurchaseOrder.findByIdAndUpdate(paymentFound.purchaseOrderId, {
+    await PurchaseOrder.findByIdAndUpdate(paymentFound.purchaseOrder, {
       totalPayments: purchaseOrderFound.totalPayments + 1,
       purchaseOrderId: null,
     });
+
+    await subtractAmountOwed(paymentFound.farmer, paymentFound.amount);
+    await closeProcurement(paymentFound.procurement);
   }
 
-  const payment = await Payment.findByIdAndUpdate(paymentFound._id, {
-    receipt,
-    status,
-    updatedBy: req.user._id,
-    updatedOn: Date.now(),
-  });
+  const payment = await Payment.findByIdAndUpdate(
+    paymentFound._id,
+    {
+      receipt,
+      ...(status && { status }), // Conditionally update the status field if the status variable is truthy
+      updatedBy: req.user._id,
+    },
+    { new: true }
+  );
 
   return res.status(200).json({
     status: "OK",

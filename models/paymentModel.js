@@ -86,35 +86,11 @@ paymentSchema.statics.addAmountOwed = async function (farmer, amount) {
   });
 };
 
-paymentSchema.statics.subtractAmountOwed = async function (farmer, amount) {
-  const farmerFound = await Farmer.findById(farmer);
-  await Farmer.findByIdAndUpdate(farmer, {
-    amountOwed: farmerFound.amountOwed - amount,
-  });
-};
-
-paymentSchema.statics.closeProcurement = async function (procurementId) {
-  // const procurementFound = await Procurement.findById(procurementId);
-  const paymentsFound = await Payment.find({ procurement: procurementId });
-
-  let paidFully = true;
-
-  paymentsFound.forEach((payment) => {
-    if (payment.status === "Pending") paidFully = false;
-  });
-
-  if (paidFully === true)
-    await Procurement.findByIdAndUpdate(procurementId, { status: "closed" });
-};
 
 paymentSchema.post("save", async function () {
   await this.constructor.addAmountOwed(this.farmer, this.amount);
 });
 
-paymentSchema.post("findOneAndUpdate", async function (doc) {
-  await doc.constructor.subtractAmountOwed(doc.farmer, doc.amount);
-  await doc.constructor.closeProcurement(doc.procurement);
-});
 
 paymentSchema.pre(/^save/, function (next) {
   this.id = `PA-${uuidv4().slice(0, 5)}`;
