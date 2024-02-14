@@ -197,7 +197,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
   await sharp(req.file.buffer)
-    .resize(764, 320) //reizes the image to 752x320
+    .resize(780, 320) //reizes the image to 780x320
     .toFormat("jpeg") //converts the image to a jpeg format
     .jpeg({ quality: 90 }) //sets the quality to 90% of the original quality
     .toFile(`public/img/payment-receipt/receipt.jpeg`);
